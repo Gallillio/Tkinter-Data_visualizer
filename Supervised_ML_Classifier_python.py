@@ -70,6 +70,8 @@ def file_path_opener():
     csv_submission_successful = messagebox.showinfo("Submission Successful", "The data has been submitted successfully")
     if csv_submission_successful == "ok":
         choose_csv_frame.grid_forget()
+        treeview_of_df()
+
 
 def choose_csv():
     #label frame to put things in
@@ -80,23 +82,24 @@ def choose_csv():
 
 def treeview_of_df():
     # create tree view frame & treeview
-    treevew_data_frame = LabelFrame(root, text="Data Display")
-    tv = ttk.Treeview(treevew_data_frame, height = 12)
+    treevew_data_frame = LabelFrame(root, padx=40, text="Data Display")
+    tree_scroll = Scrollbar(treevew_data_frame)
+    tree_scroll.pack(side=RIGHT, fill=Y)
+    tv = ttk.Treeview(treevew_data_frame, yscrollcommand=tree_scroll.set, height = 15)
 
     #put it on grid
     treevew_data_frame.grid(row= 1, column= 0)
-    
-    
+    tree_scroll.config(command= tv.yview)
 
-    # tv["column"] = list(df.columns)
-    # tv["show"] = "headings"
-    # for column in tv["column"]:
-    #     tv.heading(column, text = column)
+    tv["column"] = list(df.columns)
+    tv["show"] = "headings"
+    for column in tv["column"]:
+        tv.heading(column, text = column)
 
-    # df_rows = df.to_numpy().tolist()
-    # for row in df_rows:
-    #     tv.insert("", "end", values= row)
-    # tv.grid(row= 100, column= 0)
+    df_rows = df.to_numpy().tolist()
+    for row in df_rows:
+        tv.insert("", "end", values= row)
+    tv.grid(row= 100, column= 0)
     
 
 def main() -> int:
@@ -111,7 +114,6 @@ def main() -> int:
 
     create_root("Supervised ML Classifier")
     choose_csv()
-
 
     #runs the looping root
     root_loop()

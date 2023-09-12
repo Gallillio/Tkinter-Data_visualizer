@@ -1,4 +1,4 @@
-#~~ Importations ~~#
+#~~ Imports ~~#
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -40,9 +40,10 @@ def create_root(project_name):
     title_label.grid(row=0, column=0)
     
     #size
-    # width= root.winfo_screenwidth()               
-    # height= root.winfo_screenheight()  
-    root.geometry("500x500")    
+    width= root.winfo_screenwidth()               
+    height= root.winfo_screenheight()
+    root.geometry("%dx%d" % (width, height))
+    # root.geometry("500x500")
 
 def root_loop() -> int:
     #start root loop
@@ -64,18 +65,38 @@ def file_path_opener():
     #make df
     global df
     df = pd.read_csv(file_path)
-    print(df)
-    
+
+    #delete choose_csv_frame
+    csv_submission_successful = messagebox.showinfo("Submission Successful", "The data has been submitted successfully")
+    if csv_submission_successful == "ok":
+        choose_csv_frame.grid_forget()
+
 def choose_csv():
     #label frame to put things in
-    choose_csv_frame = LabelFrame(root, pady= 6, padx=15)
     choose_csv_frame.grid(row=1,column=0)
     
     choose_csv_button = Button(choose_csv_frame, text="Choose Select CSV File", command= file_path_opener)
     choose_csv_button.grid(row= 0, column=0)
+
+def treeview_of_df():
+    # create tree view frame & treeview
+    treevew_data_frame = LabelFrame(root, text="Data Display")
+    tv = ttk.Treeview(treevew_data_frame, height = 12)
+
+    #put it on grid
+    treevew_data_frame.grid(row= 1, column= 0)
     
     
-    
+
+    # tv["column"] = list(df.columns)
+    # tv["show"] = "headings"
+    # for column in tv["column"]:
+    #     tv.heading(column, text = column)
+
+    # df_rows = df.to_numpy().tolist()
+    # for row in df_rows:
+    #     tv.insert("", "end", values= row)
+    # tv.grid(row= 100, column= 0)
     
 
 def main() -> int:
@@ -90,8 +111,6 @@ def main() -> int:
 
     create_root("Supervised ML Classifier")
     choose_csv()
-    
-
 
 
     #runs the looping root
@@ -100,4 +119,5 @@ def main() -> int:
     return 0
     
 if (__name__ == "__main__"):
+    
     main()

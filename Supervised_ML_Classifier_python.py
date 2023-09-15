@@ -37,7 +37,7 @@ def create_root(project_name):
     
     #title at top
     title_label = Label(root, bg="gray", padx = 185, text = project_name)
-    title_label.grid(row=0, column=0)
+    title_label.place(anchor=CENTER, relx= 0.5, y=10)
     
     #size
     width= root.winfo_screenwidth()               
@@ -69,27 +69,31 @@ def file_path_opener():
     #delete choose_csv_frame
     csv_submission_successful = messagebox.showinfo("Submission Successful", "The data has been submitted successfully")
     if csv_submission_successful == "ok":
-        choose_csv_frame.grid_forget()
+        choose_csv_frame.place_forget()
         treeview_of_df()
+    
 
 
 def choose_csv():
     #label frame to put things in
-    choose_csv_frame.grid(row=1,column=0)
+    # choose_csv_frame.grid(row=1,column=0)
+    choose_csv_frame.place(anchor=CENTER, relx= 0.5, y=50)
     
     choose_csv_button = Button(choose_csv_frame, text="Choose Select CSV File", command= file_path_opener)
     choose_csv_button.grid(row= 0, column=0)
+    # choose_csv_button.place(anchor=CENTER, relx= 0.5, y=50)
 
 def treeview_of_df():
     # create tree view frame & treeview
     treevew_data_frame = LabelFrame(root, padx=40, text="Data Display")
     tree_scroll = Scrollbar(treevew_data_frame)
-    tree_scroll.pack(side=RIGHT, fill=Y)
-    tv = ttk.Treeview(treevew_data_frame, yscrollcommand=tree_scroll.set, height = 15)
+    # tree_scroll.pack(side=RIGHT, fill=Y)
+    tv = ttk.Treeview(treevew_data_frame, height = 25)
 
     #put it on grid
-    treevew_data_frame.grid(row= 1, column= 0)
-    tree_scroll.config(command= tv.yview)
+    # treevew_data_frame.grid(row= 1, column= 0)
+    treevew_data_frame.place(anchor=CENTER, relx= 0.5, rely= 0.3)
+    # tree_scroll.config(command= tv.yview)
 
     tv["column"] = list(df.columns)
     tv["show"] = "headings"
@@ -100,6 +104,7 @@ def treeview_of_df():
     for row in df_rows:
         tv.insert("", "end", values= row)
     tv.grid(row= 100, column= 0)
+    # tv.place(anchor=CENTER, relx= 0.5, y=10)
     
 
 def main() -> int:

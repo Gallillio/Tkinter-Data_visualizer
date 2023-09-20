@@ -44,7 +44,7 @@ def create_root(project_name):
     # height= root.winfo_screenheight()
     # root.geometry("%dx%d" % (width, height))
     root.geometry("1400x700")
-    root.resizable(False,False)
+    # root.resizable(False,False)
 
 def root_loop() -> int:
     #start root loop
@@ -81,6 +81,7 @@ def choose_csv():
     choose_csv_button.grid(row= 0, column=0)
 
 def treeview_of_df():
+    #~~ treeview ~~#
     # create tree view frame & treeview
     treevew_data_frame = LabelFrame(root, padx=40, text="Data Display")
     tv = ttk.Treeview(treevew_data_frame,height=15)
@@ -108,10 +109,22 @@ def treeview_of_df():
     for row in df_rows:
         tv.insert("", "end", values= row)
 
-    # tv.place(width=646, height=410)
     tv.pack()
 
+    #~~ Simple EDA ~~#
+    #check is_na of all columns
     
+    for column in df.columns:
+        column_is_na = f"{column}: {df[column].isna().any()}"
+
+        column_is_na_label = Label(root, padx = 185, text = column_is_na)
+        # column_is_na_label.place(anchor=CENTER, relx= 0.5, y=10)
+        column_is_na_label.pack()
+
+
+    #~~ What actions ~~#
+    # transform_data_button = Button(treevew_data_frame, text="Transform")
+    # transform_data_button.grid(row= 0, column=0)
 
 def main() -> int:
     """

@@ -121,7 +121,7 @@ def treeview_of_df():
     df_EDA = pd.DataFrame(data, columns=["column_name", "column_has_NA"])
 
     # create tree view to show each column and if it has NA values
-    treevew_EDA_data_frame = LabelFrame(root, width=100, text="columns have NA")
+    treevew_EDA_data_frame = LabelFrame(root, padx=40, text="Does Column have NA")
     tv_EDA = ttk.Treeview(treevew_EDA_data_frame)
     y_scrollbar_EDA = ttk.Scrollbar(treevew_EDA_data_frame, orient="vertical", command=tv_EDA.yview)
     x_scrollbar_EDA = ttk.Scrollbar(treevew_EDA_data_frame, orient="horizontal", command=tv_EDA.xview)
@@ -147,8 +147,6 @@ def treeview_of_df():
 
     tv_EDA.pack()
    
-
-
     #~~ What actions ~~#
     # transform_data_button = Button(treevew_data_frame, text="Transform")
     # transform_data_button.grid(row= 0, column=0)

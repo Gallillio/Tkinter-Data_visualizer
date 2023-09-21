@@ -85,7 +85,7 @@ def treeview_of_df():
     # create tree view frame & treeview
     treevew_data_frame = LabelFrame(root, padx=40, text="Data Display")
     tv = ttk.Treeview(treevew_data_frame,height=15)
-    y_scrollbar = ttk.Scrollbar(treevew_data_frame, orient="vertical")
+    y_scrollbar = ttk.Scrollbar(treevew_data_frame, orient="vertical", command= tv.yview)
     x_scrollbar = ttk.Scrollbar(treevew_data_frame, orient="horizontal", command=tv.xview)
 
     #put frame on grid
@@ -95,8 +95,6 @@ def treeview_of_df():
 
     y_scrollbar.pack(side=RIGHT, fill="y")
     x_scrollbar.pack(side=BOTTOM, fill="x")
-    y_scrollbar.config(command= tv.yview)
-    x_scrollbar.config(command= tv.xview)
 
     #show columns and list
     tv["column"] = list(df.columns)
@@ -112,14 +110,43 @@ def treeview_of_df():
     tv.pack()
 
     #~~ Simple EDA ~~#
-    #check is_na of all columns
-    
-    for column in df.columns:
-        column_is_na = f"{column}: {df[column].isna().any()}"
 
-        column_is_na_label = Label(root, padx = 185, text = column_is_na)
-        # column_is_na_label.place(anchor=CENTER, relx= 0.5, y=10)
-        column_is_na_label.pack()
+    #check is_na of all columns
+    #create dataframe with data
+    data = []
+    for column in df.columns:
+        column_has_na_list = [column, df[column].isna().any()]
+        data.append(column_has_na_list)
+        
+    df_EDA = pd.DataFrame(data, columns=["column_name", "column_has_NA"])
+
+    # create tree view to show each column and if it has NA values
+    treevew_EDA_data_frame = LabelFrame(root, width=100, text="columns have NA")
+    tv_EDA = ttk.Treeview(treevew_EDA_data_frame)
+    y_scrollbar_EDA = ttk.Scrollbar(treevew_EDA_data_frame, orient="vertical", command=tv_EDA.yview)
+    x_scrollbar_EDA = ttk.Scrollbar(treevew_EDA_data_frame, orient="horizontal", command=tv_EDA.xview)
+
+    #put frame on grid
+    treevew_EDA_data_frame.pack(side=LEFT)
+    #put scroll bars
+    tv_EDA.configure(yscrollcommand=y_scrollbar_EDA.set, xscrollcommand=x_scrollbar_EDA.set)
+
+    y_scrollbar_EDA.pack(side=RIGHT, fill="y")
+    x_scrollbar_EDA.pack(side=BOTTOM, fill="x")
+
+    # #show columns and list
+    tv_EDA["column"] = list(df_EDA.columns)
+    tv_EDA["show"] = "headings"
+    for column in tv_EDA["column"]:
+        tv_EDA.heading(column, text = column)
+        tv_EDA.column(column, width=100, minwidth=100)
+
+    df_EDA_rows = df_EDA.to_numpy().tolist()
+    for row in df_EDA_rows:
+        tv_EDA.insert("", "end", values= row)
+
+    tv_EDA.pack()
+   
 
 
     #~~ What actions ~~#

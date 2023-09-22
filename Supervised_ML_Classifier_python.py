@@ -32,7 +32,7 @@ df = pd.DataFrame() #will ve reassigned in csv_opener()
 # I keep all frames here incase I want to delete them later
 choose_csv_frame = LabelFrame(root, pady= 6, padx=15)
 treevew_data_frame = LabelFrame(root, padx=40, text="Data Display")
-treevew_EDA_data_frame = LabelFrame(root, padx=40, text="Does Column have NA")
+treevew_has_NA_data_frame = LabelFrame(root, padx=40, text="Does Column have NA")
 transoform_data_frame = LabelFrame(root, text="Transform Data")
 
 
@@ -60,6 +60,11 @@ def root_loop() -> int:
 
  #get file path
 
+def run_code():
+    choose_csv_frame.place_forget()
+    treeview_of_df()
+    transform_data()
+
 def csv_opener():
     #choose CSV File
     csv_file_name = Label(choose_csv_frame ,text="No File Selected")
@@ -76,9 +81,10 @@ def csv_opener():
     #delete choose_csv_frame / Starts Actual Apps
     csv_submission_successful = messagebox.showinfo("Submission Successful", "The data has been submitted successfully")
     if csv_submission_successful == "ok":
-        choose_csv_frame.place_forget()
-        treeview_of_df()
-        transform_data()
+        # choose_csv_frame.place_forget()
+        # treeview_of_df()
+        # transform_data()
+        run_code()
 
 def choose_csv():
     #label frame to put things in
@@ -124,40 +130,41 @@ def treeview_of_df():
         column_has_na_list = [column, df[column].isna().any()]
         data.append(column_has_na_list)
         
-    df_EDA = pd.DataFrame(data, columns=["column_name", "column_has_NA"])
+    df_has_NA = pd.DataFrame(data, columns=["column_name", "column_has_NA"])
 
     # create tree view to show each column and if it has NA values
-    tv_EDA = ttk.Treeview(treevew_EDA_data_frame)
-    y_scrollbar_EDA = ttk.Scrollbar(treevew_EDA_data_frame, orient="vertical", command=tv_EDA.yview)
-    x_scrollbar_EDA = ttk.Scrollbar(treevew_EDA_data_frame, orient="horizontal", command=tv_EDA.xview)
+    tv_has_NA = ttk.Treeview(treevew_has_NA_data_frame)
+    y_scrollbar_has_NA = ttk.Scrollbar(treevew_has_NA_data_frame, orient="vertical", command=tv_has_NA.yview)
+    x_scrollbar_has_NA = ttk.Scrollbar(treevew_has_NA_data_frame, orient="horizontal", command=tv_has_NA.xview)
 
     #put frame on grid
-    treevew_EDA_data_frame.pack(side=LEFT)
+    treevew_has_NA_data_frame.pack(side=LEFT)
     #put scroll bars
-    tv_EDA.configure(yscrollcommand=y_scrollbar_EDA.set, xscrollcommand=x_scrollbar_EDA.set)
+    tv_has_NA.configure(yscrollcommand=y_scrollbar_has_NA.set, xscrollcommand=x_scrollbar_has_NA.set)
 
-    y_scrollbar_EDA.pack(side=RIGHT, fill="y")
-    x_scrollbar_EDA.pack(side=BOTTOM, fill="x")
+    y_scrollbar_has_NA.pack(side=RIGHT, fill="y")
+    x_scrollbar_has_NA.pack(side=BOTTOM, fill="x")
 
     # #show columns and list
-    tv_EDA["column"] = list(df_EDA.columns)
-    tv_EDA["show"] = "headings"
-    for column in tv_EDA["column"]:
-        tv_EDA.heading(column, text = column)
-        tv_EDA.column(column, width=100, minwidth=100)
+    tv_has_NA["column"] = list(df_has_NA.columns)
+    tv_has_NA["show"] = "headings"
+    for column in tv_has_NA["column"]:
+        tv_has_NA.heading(column, text = column)
+        tv_has_NA.column(column, width=100, minwidth=100)
 
-    df_EDA_rows = df_EDA.to_numpy().tolist()
-    for row in df_EDA_rows:
-        tv_EDA.insert("", "end", values= row)
+    df_has_NA_rows = df_has_NA.to_numpy().tolist()
+    for row in df_has_NA_rows:
+        tv_has_NA.insert("", "end", values= row)
 
-    tv_EDA.pack()
+    tv_has_NA.pack()
 
 def encode_columns():
     def actually_encode_column(column):
         label_encoder = LabelEncoder()
         global df
         df[column] = label_encoder.fit_transform(df[column])
-        
+
+        messagebox.showinfo("Encoding Successful", "The data has been encodded successfully")
 
     #making window
     encode_columns_window = Toplevel(root, padx=30)
@@ -173,9 +180,21 @@ def encode_columns():
         Label(encode_columns_window, text = column).grid(row=i+1, column=0)
         Button(encode_columns_window, text= "encode",command= lambda: actually_encode_column(column)).grid(row=i+1, column=1)
         Label(encode_columns_window, text = column_has_NA).grid(row=i+1, column=2)
-
     
+    #Update treeviews function
+    def close_encoding_window():
+        encode_columns_window.destroy()
 
+        #delete old treeview and repack it
+        for widgets in treevew_data_frame.winfo_children():
+            widgets.destroy()
+        #deletes old 
+        for widgets in treevew_has_NA_data_frame.winfo_children():
+            widgets.destroy()
+        treeview_of_df()
+
+    #Closing & Saving button
+    Button(encode_columns_window, text= "Close & Save", command=close_encoding_window).grid(row=1010, column=1)
 
 def transform_data():
     transoform_data_frame.pack(side=LEFT)

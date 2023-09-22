@@ -24,11 +24,17 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import Ridge, Lasso
 from sklearn.model_selection import GridSearchCV
 
-#Global Variables that need to be placed
+#Global Variables & Frames that need to be placed
 root = Tk()
 file_path = 'change this in function below' #will be reassigned in csv_opener()
-choose_csv_frame = LabelFrame(root, pady= 6, padx=15)
 df = pd.DataFrame() #will ve reassigned in csv_opener()
+
+# I keep all frames here incase I want to delete them later
+choose_csv_frame = LabelFrame(root, pady= 6, padx=15)
+treevew_data_frame = LabelFrame(root, padx=40, text="Data Display")
+treevew_EDA_data_frame = LabelFrame(root, padx=40, text="Does Column have NA")
+transoform_data_frame = LabelFrame(root, text="Transform Data")
+
 
 def create_root(project_name):
     
@@ -67,11 +73,12 @@ def csv_opener():
     global df
     df = pd.read_csv(file_path)
 
-    #delete choose_csv_frame
+    #delete choose_csv_frame / Starts Actual Apps
     csv_submission_successful = messagebox.showinfo("Submission Successful", "The data has been submitted successfully")
     if csv_submission_successful == "ok":
         choose_csv_frame.place_forget()
         treeview_of_df()
+        transform_data()
 
 def choose_csv():
     #label frame to put things in
@@ -83,7 +90,6 @@ def choose_csv():
 def treeview_of_df():
     #~~ treeview ~~#
     # create tree view frame & treeview
-    treevew_data_frame = LabelFrame(root, padx=40, text="Data Display")
     tv = ttk.Treeview(treevew_data_frame,height=15)
     y_scrollbar = ttk.Scrollbar(treevew_data_frame, orient="vertical", command= tv.yview)
     x_scrollbar = ttk.Scrollbar(treevew_data_frame, orient="horizontal", command=tv.xview)
@@ -121,7 +127,6 @@ def treeview_of_df():
     df_EDA = pd.DataFrame(data, columns=["column_name", "column_has_NA"])
 
     # create tree view to show each column and if it has NA values
-    treevew_EDA_data_frame = LabelFrame(root, padx=40, text="Does Column have NA")
     tv_EDA = ttk.Treeview(treevew_EDA_data_frame)
     y_scrollbar_EDA = ttk.Scrollbar(treevew_EDA_data_frame, orient="vertical", command=tv_EDA.yview)
     x_scrollbar_EDA = ttk.Scrollbar(treevew_EDA_data_frame, orient="horizontal", command=tv_EDA.xview)
@@ -146,10 +151,39 @@ def treeview_of_df():
         tv_EDA.insert("", "end", values= row)
 
     tv_EDA.pack()
-   
+
+def encode_columns():
+    def actually_encode_column(column):
+        label_encoder = LabelEncoder()
+        global df
+        df[column] = label_encoder.fit_transform(df[column])
+        
+
+    #making window
+    encode_columns_window = Toplevel(root, padx=30)
+    encode_columns_window.title("Encoding Columns")
+    encode_columns_window.geometry("400x500")
+
+    #each column and a button to encode it
+    Label(encode_columns_window, text ="Columns").grid(row=0, column=0)
+    Label(encode_columns_window, text ="Encode it?").grid(row=0, column=1)
+    Label(encode_columns_window, text ="Column has NA").grid(row=0, column=2)
+    for i, column in enumerate(df.columns):
+        column_has_NA = df[column].isna().any()
+        Label(encode_columns_window, text = column).grid(row=i+1, column=0)
+        Button(encode_columns_window, text= "encode",command= lambda: actually_encode_column(column)).grid(row=i+1, column=1)
+        Label(encode_columns_window, text = column_has_NA).grid(row=i+1, column=2)
+
+    
+
+
+def transform_data():
+    transoform_data_frame.pack(side=LEFT)
+
     #~~ What actions ~~#
-    # transform_data_button = Button(treevew_data_frame, text="Transform")
-    # transform_data_button.grid(row= 0, column=0)
+    encode_column_button = Button(transoform_data_frame, text="Encode Column", command=encode_columns)
+    encode_column_button.pack()
+
 
 def main() -> int:
     """

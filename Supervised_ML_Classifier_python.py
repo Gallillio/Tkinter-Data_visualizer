@@ -226,26 +226,43 @@ def handle_NA():
         Label(handle_NA_window, bg="lightgray", text ="Choose How to Handle Column").grid(row=2, column=1)
         def replace_NA_with_mean():
             column_to_handle = column_to_handle_na.get()
-            
+
             global df
             mean = df[column_to_handle].mean()
             df[column_to_handle].fillna(value=mean, inplace=True)
-            print(column_to_handle, mean)
+            messagebox.showinfo("Filling Successful", "NA cells have been filled with mean successfully")
+
         def remove_NA_row():
             column_to_handle = column_to_handle_na.get()
 
             global df
             df.dropna(subset = [column_to_handle], inplace=True)
+            messagebox.showinfo("Removal Successful", "The rows has been removed successfully")
 
         for i, column in enumerate(df.columns, start= 3):
-            if df[column].isna().any() == True:
+            if df[column].isna().any() == False:
                 continue
             else:
                 Label(handle_NA_window, text = column).grid(row=i, column=0)
+                print(i)
 
         Button(handle_NA_window, text= "Replace with Mean",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
         Button(handle_NA_window, text= "Remove Entire Row",command= lambda: remove_NA_row()).grid(row=4, column=1)
 
+        #Update treeviews function
+        def close_handle_NA_window():
+            handle_NA_window.destroy()
+
+            #delete old treeview and repack it
+            for widgets in treevew_data_frame.winfo_children():
+                widgets.destroy()
+            #deletes old 
+            for widgets in treevew_has_NA_data_frame.winfo_children():
+                widgets.destroy()
+            treeview_of_df()
+
+        #Closing & Saving button
+        Button(handle_NA_window, text= "Close & Save", command=close_handle_NA_window).grid(row=1010, column=1, columnspan=1)
 
 
 

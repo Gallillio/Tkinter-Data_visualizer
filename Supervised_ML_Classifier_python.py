@@ -239,11 +239,13 @@ def handle_NA():
             df.dropna(subset = [column_to_handle], inplace=True)
             messagebox.showinfo("Removal Successful", "The rows has been removed successfully")
 
+        count_skipped_list = [] #this list will be used to count how many times the loop was skipped (continue) so that the unskipped Labels print in the correct grid
         for i, column in enumerate(df.columns, start= 3):
             if df[column].isna().any() == False:
+                count_skipped_list.append(1)
                 continue
             else:
-                Label(handle_NA_window, text = column).grid(row=i, column=0)
+                Label(handle_NA_window, text = column).grid(row=i - len(count_skipped_list), column=0)
                 print(i)
 
         Button(handle_NA_window, text= "Replace with Mean",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)

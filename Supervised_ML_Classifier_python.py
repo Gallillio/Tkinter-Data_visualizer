@@ -33,7 +33,7 @@ df = pd.DataFrame() #will ve reassigned in csv_opener()
 choose_csv_frame = LabelFrame(root, pady= 6, padx=15)
 treevew_data_frame = LabelFrame(root, padx=40, text="Data Display")
 treevew_has_NA_data_frame = LabelFrame(root, padx=40, text="Does Column have NA")
-transoform_data_frame = LabelFrame(root, text="Transform Data")
+transoform_data_frame = LabelFrame(root, padx=20, text="Transform Data")
 
 
 def create_root(project_name):
@@ -159,27 +159,34 @@ def treeview_of_df():
     tv_has_NA.pack()
 
 def encode_columns():
-    def actually_encode_column(column):
+    column_entry_get = StringVar()
+
+    def actually_encode_column():
+        column_to_encode = column_entry_get.get()
         label_encoder = LabelEncoder()
         global df
-        df[column] = label_encoder.fit_transform(df[column])
+        df[column_to_encode] = label_encoder.fit_transform(df[column_to_encode])
 
         messagebox.showinfo("Encoding Successful", "The data has been encodded successfully")
 
     #making window
     encode_columns_window = Toplevel(root, padx=30)
     encode_columns_window.title("Encoding Columns")
-    encode_columns_window.geometry("400x500")
+    encode_columns_window.geometry("440x500")
+
+    Label(encode_columns_window, text= "Enter Column Name to Encode: ").grid(row=0, column=0)
+    column_entry = Entry(encode_columns_window, textvariable= column_entry_get).grid(row=0, column=1)
+    Button(encode_columns_window, text= "encode", command= lambda: actually_encode_column()).grid(row=0, column=2)
+    encode_columns_window
 
     #each column and a button to encode it
-    Label(encode_columns_window, text ="Columns").grid(row=0, column=0)
-    Label(encode_columns_window, text ="Encode it?").grid(row=0, column=1)
-    Label(encode_columns_window, text ="Column has NA").grid(row=0, column=2)
+    Label(encode_columns_window,bg="lightgray", text ="Columns").grid(row=1, column=0)
+    Label(encode_columns_window,bg="lightgray", text ="Column has NA").grid(row=1, column=2)
+
     for i, column in enumerate(df.columns):
         column_has_NA = df[column].isna().any()
-        Label(encode_columns_window, text = column).grid(row=i+1, column=0)
-        Button(encode_columns_window, text= "encode",command= lambda: actually_encode_column(column)).grid(row=i+1, column=1)
-        Label(encode_columns_window, text = column_has_NA).grid(row=i+1, column=2)
+        Label(encode_columns_window, text = column).grid(row=i+2, column=0)
+        Label(encode_columns_window, text = column_has_NA).grid(row=i+2, column=2)
     
     #Update treeviews function
     def close_encoding_window():
@@ -194,14 +201,62 @@ def encode_columns():
         treeview_of_df()
 
     #Closing & Saving button
-    Button(encode_columns_window, text= "Close & Save", command=close_encoding_window).grid(row=1010, column=1)
+    Button(encode_columns_window, text= "Close & Save", command=close_encoding_window).grid(row=1010, column=1, columnspan=1)
+
+def handle_NA():
+    column_to_handle_na = StringVar()
+
+    #check if any columns have NA
+    if df.isnull().any().any() == False:
+        messagebox.showinfo("No NA values found", "All columns don't contain any NA")
+    #open window to handle NA values
+    elif df.isnull().any().any() == True:
+        handle_NA_window = Toplevel(root, padx=30)
+        handle_NA_window.title("Handle NA")
+        handle_NA_window.geometry("420x500")
+
+        #title at top
+        title_label = Label(handle_NA_window, bg="gray", padx = 105, text = "Columns Containing NA")
+        title_label.grid(row=0, column=0, columnspan=3)
+        # Label(handle_NA_window, bg="lightgray", text ="How to Handle it?").grid(row=1, column=1, columnspan=2)
+        Label(handle_NA_window, bg="lightgray", text ="Enter Column Name to Handle").grid(row=1, column=0)
+        column_entry = Entry(handle_NA_window, textvariable= column_to_handle_na).grid(row=1, column=1)
+
+        Label(handle_NA_window, bg="lightgray", text ="Columns").grid(row=2, column=0)
+        Label(handle_NA_window, bg="lightgray", text ="Choose How to Handle Column").grid(row=2, column=1)
+        def replace_NA_with_mean():
+            column_to_handle = column_to_handle_na.get()
+            
+            global df
+            mean = df[column_to_handle].mean()
+            df[column_to_handle].fillna(value=mean, inplace=True)
+            print(column_to_handle, mean)
+        def remove_NA_row():
+            column_to_handle = column_to_handle_na.get()
+
+            global df
+            df.dropna(subset = [column_to_handle], inplace=True)
+
+        for i, column in enumerate(df.columns, start= 3):
+            if df[column].isna().any() == True:
+                continue
+            else:
+                Label(handle_NA_window, text = column).grid(row=i, column=0)
+
+        Button(handle_NA_window, text= "Replace with Mean",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
+        Button(handle_NA_window, text= "Remove Entire Row",command= lambda: remove_NA_row()).grid(row=4, column=1)
+
+
+
 
 def transform_data():
     transoform_data_frame.pack(side=LEFT)
 
     #~~ What actions ~~#
-    encode_column_button = Button(transoform_data_frame, text="Encode Column", command=encode_columns)
-    encode_column_button.pack()
+    Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
+    Button(transoform_data_frame, text="Handle NA", command=handle_NA).pack()
+    # Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
+    # Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
 
 
 def main() -> int:

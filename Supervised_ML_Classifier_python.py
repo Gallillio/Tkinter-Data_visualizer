@@ -184,6 +184,9 @@ def encode_columns():
     encode_columns_window = Toplevel(root, padx=30)
     encode_columns_window.title("Encoding Columns")
     encode_columns_window.geometry("440x500")
+    #make window behind this one unclickable
+    encode_columns_window.grab_set()
+    encode_columns_window.transient(root)
 
     Label(encode_columns_window, text= "Enter Column Name to Encode: ").grid(row=0, column=0)
     Entry(encode_columns_window, textvariable= column_entry_get).grid(row=0, column=1)
@@ -213,6 +216,10 @@ def handle_NA():
         handle_NA_window = Toplevel(root, padx=30)
         handle_NA_window.title("Handle NA")
         handle_NA_window.geometry("420x500")
+
+        #make window behind this one unclickable
+        handle_NA_window.grab_set()
+        handle_NA_window.transient(root)
 
         #title at top
         title_label = Label(handle_NA_window, bg="gray", padx = 105, text = "Columns Containing NA")
@@ -297,6 +304,10 @@ def remove_column():
         remove_column_window = Toplevel(root, padx=30)
         remove_column_window.title("Remove Column")
         remove_column_window.geometry("460x500")
+
+        #make window behind this one unclickable
+        remove_column_window.grab_set()
+        remove_column_window.transient(root)
 
         Label(remove_column_window, text= "Enter Column Name to Remove: ").grid(row=0, column=0)
         Entry(remove_column_window, textvariable= column_entry_get).grid(row=0, column=1)

@@ -158,6 +158,17 @@ def treeview_of_df():
 
     tv_has_NA.pack()
 
+def close_whatever_transform_window(transform_window):
+    transform_window.destroy()
+
+    #delete old treeview and repack it
+    for widgets in treevew_data_frame.winfo_children():
+        widgets.destroy()
+    #deletes old 
+    for widgets in treevew_has_NA_data_frame.winfo_children():
+        widgets.destroy()
+    treeview_of_df()
+
 def encode_columns():
     column_entry_get = StringVar()
 
@@ -175,11 +186,11 @@ def encode_columns():
     encode_columns_window.geometry("440x500")
 
     Label(encode_columns_window, text= "Enter Column Name to Encode: ").grid(row=0, column=0)
-    column_entry = Entry(encode_columns_window, textvariable= column_entry_get).grid(row=0, column=1)
+    Entry(encode_columns_window, textvariable= column_entry_get).grid(row=0, column=1)
     Button(encode_columns_window, text= "encode", command= lambda: actually_encode_column()).grid(row=0, column=2)
     encode_columns_window
 
-    #each column and a button to encode it
+    #each column
     Label(encode_columns_window,bg="lightgray", text ="Columns").grid(row=1, column=0)
     Label(encode_columns_window,bg="lightgray", text ="Column has NA").grid(row=1, column=2)
 
@@ -188,20 +199,8 @@ def encode_columns():
         Label(encode_columns_window, text = column).grid(row=i+2, column=0)
         Label(encode_columns_window, text = column_has_NA).grid(row=i+2, column=2)
     
-    #Update treeviews function
-    def close_encoding_window():
-        encode_columns_window.destroy()
-
-        #delete old treeview and repack it
-        for widgets in treevew_data_frame.winfo_children():
-            widgets.destroy()
-        #deletes old 
-        for widgets in treevew_has_NA_data_frame.winfo_children():
-            widgets.destroy()
-        treeview_of_df()
-
     #Closing & Saving button
-    Button(encode_columns_window, text= "Close & Save", command=close_encoding_window).grid(row=1010, column=1, columnspan=1)
+    Button(encode_columns_window, text= "Close & Save", command=lambda: close_whatever_transform_window(encode_columns_window)).grid(row=1010, column=1, columnspan=1)
 
 def handle_NA():
     column_to_handle_na = StringVar()
@@ -224,20 +223,40 @@ def handle_NA():
 
         Label(handle_NA_window, bg="lightgray", text ="Columns").grid(row=2, column=0)
         Label(handle_NA_window, bg="lightgray", text ="Choose How to Handle Column").grid(row=2, column=1)
+
         def replace_NA_with_mean():
             column_to_handle = column_to_handle_na.get()
 
             global df
             mean = df[column_to_handle].mean()
             df[column_to_handle].fillna(value=mean, inplace=True)
-            messagebox.showinfo("Filling Successful", "NA cells have been filled with mean successfully")
-
+            messagebox.showinfo("Filling Successful", "NA cells have been filled with mean successfully in the column")
         def remove_NA_row():
             column_to_handle = column_to_handle_na.get()
 
             global df
             df.dropna(subset = [column_to_handle], inplace=True)
             messagebox.showinfo("Removal Successful", "The rows has been removed successfully")
+
+        def replace_all_NA_with_mean():
+            global df
+            for col in df.columns:
+                mean = df[col].mean()
+                df[col].fillna(value=mean, inplace=True)
+
+            removal_successful = messagebox.showinfo("Filling Successful", "NA cells have been filled with mean successfully in all DataFrame")
+            if removal_successful == "ok":
+                    close_whatever_transform_window(handle_NA_window)
+        def remove_all_NA_row():
+            global df
+            for col in df.columns:
+                df.dropna(subset = [col], inplace=True)
+
+            removal_successful =  messagebox.showinfo("Removal Successful", "The rows has been removed successfully in all DataFrame")
+            if removal_successful == "ok":
+                close_whatever_transform_window(handle_NA_window)
+
+            
 
         count_skipped_list = [] #this list will be used to count how many times the loop was skipped (continue) so that the unskipped Labels print in the correct grid
         for i, column in enumerate(df.columns, start= 3):
@@ -246,26 +265,57 @@ def handle_NA():
                 continue
             else:
                 Label(handle_NA_window, text = column).grid(row=i - len(count_skipped_list), column=0)
-                print(i)
 
         Button(handle_NA_window, text= "Replace with Mean",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
         Button(handle_NA_window, text= "Remove Entire Row",command= lambda: remove_NA_row()).grid(row=4, column=1)
-
-        #Update treeviews function
-        def close_handle_NA_window():
-            handle_NA_window.destroy()
-
-            #delete old treeview and repack it
-            for widgets in treevew_data_frame.winfo_children():
-                widgets.destroy()
-            #deletes old 
-            for widgets in treevew_has_NA_data_frame.winfo_children():
-                widgets.destroy()
-            treeview_of_df()
+        Label(handle_NA_window, text= "or").grid(row=5, column=1)
+        Button(handle_NA_window, text= "Replace all NA with Mean",command= lambda: replace_all_NA_with_mean()).grid(row=6, column=1)
+        Button(handle_NA_window, text= "Remove all NA rows Entirely",command= lambda: remove_all_NA_row()).grid(row=7, column=1)
 
         #Closing & Saving button
-        Button(handle_NA_window, text= "Close & Save", command=close_handle_NA_window).grid(row=1010, column=1, columnspan=1)
+        Button(handle_NA_window, text= "Close & Save", command=lambda: close_whatever_transform_window(handle_NA_window)).grid(row=1010, column=1)    
 
+def remove_column():
+        column_entry_get = StringVar()
+        def actually_remove_column():
+            column_to_remove = column_entry_get.get()
+            global df
+            df = df.drop(column_to_remove, axis=1)
+
+            messagebox.showinfo("Removal Successful", "The column has been removed successfully")
+        def actually_remove_all_non_int_columns():
+            global df
+            for col in df.columns:
+                if df[col].dtype == 'int64' or df[col].dtype == 'float64':
+                    continue
+                else:
+                    df = df.drop(col, axis=1)
+            removal_successful = messagebox.showinfo("Removal Successful", "All non float/int columns have been removed successfully")
+            if removal_successful == "ok":
+                    close_whatever_transform_window(remove_column_window)
+        
+        remove_column_window = Toplevel(root, padx=30)
+        remove_column_window.title("Remove Column")
+        remove_column_window.geometry("460x500")
+
+        Label(remove_column_window, text= "Enter Column Name to Remove: ").grid(row=0, column=0)
+        Entry(remove_column_window, textvariable= column_entry_get).grid(row=0, column=1)
+        Button(remove_column_window, text= "Remove Column", command= actually_remove_column).grid(row=0, column=2)
+
+        #each column
+        Label(remove_column_window,bg="lightgray", text ="Columns").grid(row=1, column=0)
+        Label(remove_column_window,bg="lightgray", text ="Column dtype").grid(row=1, column=1)
+
+        for i, column in enumerate(df.columns):
+            column_dtype = df[column].dtype
+            Label(remove_column_window, text = column).grid(row=i+2, column=0)
+            Label(remove_column_window, text = column_dtype).grid(row=i+2, column=1)
+
+        Label(remove_column_window,bg="lightgray", text ="or").grid(row=1, column=2)
+        Button(remove_column_window, text= "Remove all non \n float/int columns", command= actually_remove_all_non_int_columns).grid(row=2, column=2)
+
+        #Closing & Saving button
+        Button(remove_column_window, text= "Close & Save", command=lambda: close_whatever_transform_window(remove_column_window)).grid(row=1010, column=1)   
 
 
 def transform_data():
@@ -274,7 +324,7 @@ def transform_data():
     #~~ What actions ~~#
     Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
     Button(transoform_data_frame, text="Handle NA", command=handle_NA).pack()
-    # Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
+    Button(transoform_data_frame, text="Remove Column", command=remove_column).pack()
     # Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
 
 

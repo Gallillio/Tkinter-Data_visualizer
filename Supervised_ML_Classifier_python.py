@@ -14,6 +14,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, c
 #Misc
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from sklearn.impute import SimpleImputer
 
 #Classifiers
 from sklearn import linear_model
@@ -27,7 +28,8 @@ from sklearn.model_selection import GridSearchCV
 #Global Variables & Frames that need to be placed
 root = Tk()
 file_path = 'change this in function below' #will be reassigned in csv_opener()
-df = pd.DataFrame() #will ve reassigned in csv_opener()
+df_original = pd.DataFrame() # this df will not be transformed at all, it will keep original data
+df = pd.DataFrame() #will ve reassigned in csv_opener() / this df will be transformed
 
 # I keep all frames here incase I want to delete them later
 choose_csv_frame = LabelFrame(root, pady= 6, padx=15)
@@ -75,8 +77,9 @@ def csv_opener():
     print(file_path)
 
     #make df
-    global df
+    global df, df_original
     df = pd.read_csv(file_path)
+    df_original = df
 
     #delete choose_csv_frame / Starts Actual Apps
     csv_submission_successful = messagebox.showinfo("Submission Successful", "The data has been submitted successfully")
@@ -245,13 +248,14 @@ def handle_NA():
             df.dropna(subset = [column_to_handle], inplace=True)
             messagebox.showinfo("Removal Successful", "The rows has been removed successfully")
 
-        def replace_all_NA_with_mean():
+        def replace_all_NA_with_imputer(strategy):
             global df
-            for col in df.columns:
-                mean = df[col].mean()
-                df[col].fillna(value=mean, inplace=True)
+            copy_df_for_columns = df.columns
+            imputer = SimpleImputer(strategy=strategy)
+            df = imputer.fit_transform(df)
+            df = pd.DataFrame(df, columns=copy_df_for_columns)
 
-            removal_successful = messagebox.showinfo("Filling Successful", "NA cells have been filled with mean successfully in all DataFrame")
+            removal_successful = messagebox.showinfo("Filling Successful", "NA cells have been filled successfully in all DataFrame")
             if removal_successful == "ok":
                     close_whatever_transform_window(handle_NA_window)
         def remove_all_NA_row():
@@ -263,8 +267,6 @@ def handle_NA():
             if removal_successful == "ok":
                 close_whatever_transform_window(handle_NA_window)
 
-            
-
         count_skipped_list = [] #this list will be used to count how many times the loop was skipped (continue) so that the unskipped Labels print in the correct grid
         for i, column in enumerate(df.columns, start= 3):
             if df[column].isna().any() == False:
@@ -274,10 +276,12 @@ def handle_NA():
                 Label(handle_NA_window, text = column).grid(row=i - len(count_skipped_list), column=0)
 
         Button(handle_NA_window, text= "Replace with Mean",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
+        Button(handle_NA_window, text= "Replace with Median",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
         Button(handle_NA_window, text= "Remove Entire Row",command= lambda: remove_NA_row()).grid(row=4, column=1)
         Label(handle_NA_window, text= "or").grid(row=5, column=1)
-        Button(handle_NA_window, text= "Replace all NA with Mean",command= lambda: replace_all_NA_with_mean()).grid(row=6, column=1)
-        Button(handle_NA_window, text= "Remove all NA rows Entirely",command= lambda: remove_all_NA_row()).grid(row=7, column=1)
+        Button(handle_NA_window, text= "Replace all NA with Mean",command= lambda: replace_all_NA_with_imputer("mean")).grid(row=6, column=1)
+        Button(handle_NA_window, text= "Replace all NA with Median",command= lambda: replace_all_NA_with_imputer("median")).grid(row=7, column=1)
+        Button(handle_NA_window, text= "Remove all NA rows Entirely",command= lambda: remove_all_NA_row()).grid(row=8, column=1)
 
         #Closing & Saving button
         Button(handle_NA_window, text= "Close & Save", command=lambda: close_whatever_transform_window(handle_NA_window)).grid(row=1010, column=1)    
@@ -328,14 +332,17 @@ def remove_column():
         #Closing & Saving button
         Button(remove_column_window, text= "Close & Save", command=lambda: close_whatever_transform_window(remove_column_window)).grid(row=1010, column=1)   
 
+def feature_scaling():
+    ...
 
 def transform_data():
     transoform_data_frame.pack(side=LEFT)
 
     #~~ What actions ~~#
-    Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
     Button(transoform_data_frame, text="Handle NA", command=handle_NA).pack()
+    Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
     Button(transoform_data_frame, text="Remove Column", command=remove_column).pack()
+    Button(transoform_data_frame, text="Feature Scaling", command=feature_scaling).pack()
     # Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
 
 

@@ -30,7 +30,8 @@ root = Tk()
 file_path = 'change this in function below' #will be reassigned in csv_opener()
 df_original = pd.DataFrame() # this df will not be transformed at all, it will keep original data
 df = pd.DataFrame() #will ve reassigned in csv_opener() / this df will be transformed
-x, y = 0,0
+x, y = None,None
+x_train, x_test, y_train, y_test = None,None,None,None
 
 # I keep all frames here incase I want to delete them later
 choose_csv_frame = LabelFrame(root, pady= 6, padx=15)
@@ -70,7 +71,6 @@ def run_code():
     transform_data()
     split_data()
 
-
 def csv_opener():
     #choose CSV File
     csv_file_name = Label(choose_csv_frame ,text="No File Selected")
@@ -78,7 +78,6 @@ def csv_opener():
     csv_file_name["text"] = choose_csv_frame.filename
     global file_path
     file_path = csv_file_name["text"]
-    print(file_path)
 
     #make df
     global df, df_original
@@ -86,8 +85,8 @@ def csv_opener():
     df_original = df
 
     #delete choose_csv_frame / Starts Actual Apps
-    csv_submission_successful = messagebox.showinfo("Submission Successful", "The data has been submitted successfully")
-    if csv_submission_successful == "ok":
+    submission_successful = messagebox.showinfo("Submission Successful", "The data has been submitted successfully")
+    if submission_successful == "ok":
         run_code()
 
 def choose_csv():
@@ -339,6 +338,7 @@ def transform_data():
 def split_data():
     split_data_frame.pack(side=RIGHT, anchor=NE)
     target_column_get = StringVar()
+    train_size_get = StringVar()
     
     def select_target():
         target_column = target_column_get.get()
@@ -347,16 +347,38 @@ def split_data():
         global x, y
         x = df.drop([target_column], axis=1)
         y = df[target_column]
-        csv_submission_successful = messagebox.showinfo("Data Selection Successful", "Target and Independant Variables have been selected successfully")
-        if csv_submission_successful == "ok":
-            ...
+        submission_successful = messagebox.showinfo("Data Selection Successful", "Target and Independant Variables have been selected successfully")
+        if submission_successful == "ok":
+            #reset split_data_frame
+            for widgets in split_data_frame.winfo_children():
+                widgets.destroy()
+            split_data()
+            #show current Target Value
+            Label(split_data_frame, text= "Selected Target Column: ").grid(row=3, column=0)
+            Label(split_data_frame, text= target_column).grid(row=3, column=1)
+            
+            #add x_train, x_test, y_train, y_test Labels
+            def actually_split_data():
+                train_size = float(train_size_get.get())
+                #checks if train_size is between 0 -1, if not send an error
+                if 0 <= train_size <= 1:
+                    global x_train, x_test, y_train, y_test
+                    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=train_size)
+                    submission_successful = messagebox.showinfo("Data Split Sucecessfully", "(x_train, x_test, y_train, y_test) have been created created successfully")
+                else:
+                    pass
+            
+            Label(split_data_frame, text= "\n").grid(row=4, column=0)
+            Label(split_data_frame, bg="gray", text= "Splitting Data").grid(row=5, column=0, columnspan=2)
+            Label(split_data_frame, text= "train size(0-1): ").grid(row=6, column=0)
+            Entry(split_data_frame, textvariable= train_size_get).grid(row=6, column=1)
+            Button(split_data_frame, text= "Confirm train size & Split Data",command= lambda: actually_split_data()).grid(row=7, column=0, columnspan=2)
+            
 
-    Label(split_data_frame, text= "Input Target Column: ").grid(row=0, column=0)
-    Entry(split_data_frame, textvariable= target_column_get).grid(row=0, column=1)
-    Button(split_data_frame, text= "Confirm Target Selection",command= lambda: select_target()).grid(row=1, column=0, columnspan=1)
-
-    # input target_column
-    #label : "nope: all the other columns will be selected as the independent variables"
+    Label(split_data_frame, bg="gray", text= "Target & Independant Selection").grid(row=0, column=0, columnspan=2)
+    Label(split_data_frame, text= "Input Target Column: ").grid(row=1, column=0)
+    Entry(split_data_frame, textvariable= target_column_get).grid(row=1, column=1)
+    Button(split_data_frame, text= "Confirm Target Selection",command= lambda: select_target()).grid(row=2, column=0, columnspan=2)
 
 
 

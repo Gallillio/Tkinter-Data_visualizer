@@ -16,6 +16,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.impute import SimpleImputer
 
+#Feature Transformations
+from sklearn.preprocessing import StandardScaler
+
 #Classifiers
 from sklearn import linear_model
 from sklearn.preprocessing import PolynomialFeatures
@@ -325,9 +328,6 @@ def remove_column():
         #Closing & Saving button
         Button(remove_column_window, text= "Close & Save", command=lambda: close_whatever_transform_window(remove_column_window)).grid(row=1010, column=1)   
 
-def feature_scaling():
-    ...
-
 def transform_data():
     transoform_data_frame.pack(side=LEFT, anchor=NW)
 
@@ -337,6 +337,12 @@ def transform_data():
     Button(transoform_data_frame, text="Remove Column", command=remove_column).pack()
     # Button(transoform_data_frame, text="Feature Scaling", command=feature_scaling).pack()
     # Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
+
+def standard_scaler():
+    scaler = StandardScaler()
+    x_train_scaled = scaler.fit_transform(x_train)
+    x_test_scaled = scaler.transform(x_test) #using same mean used in scaling x_train
+
 
 def split_data():
     split_data_frame.pack(side=RIGHT, anchor=NE)
@@ -371,7 +377,7 @@ def split_data():
                     if submission_successful == "ok":
                         Label(transoform_data_frame).pack()
                         Label(transoform_data_frame, bg="gray", text="Feature Transformation Methods").pack()
-                        Button(transoform_data_frame, text="Feature Scaling", command=feature_scaling).pack()
+                        Button(transoform_data_frame, text="Standard Scaler", command=standard_scaler).pack()
                 else:
                     pass
             
@@ -379,13 +385,13 @@ def split_data():
             Label(split_data_frame, bg="gray", text= "Splitting Data").grid(row=5, column=0, columnspan=2)
             Label(split_data_frame, text= "train size(0-1): ").grid(row=6, column=0)
             Entry(split_data_frame, textvariable= train_size_get).grid(row=6, column=1)
-            Button(split_data_frame, text= "Confirm train size & Split Data",command= lambda: actually_split_data()).grid(row=7, column=0, columnspan=2)
-            
+            Button(split_data_frame, text= "Confirm train size & Split Data",command= lambda: actually_split_data()).grid(row=7, column=0, columnspan=2)           
 
     Label(split_data_frame, bg="gray", text= "Target & Independant Selection").grid(row=0, column=0, columnspan=2)
     Label(split_data_frame, text= "Input Target Column: ").grid(row=1, column=0)
     Entry(split_data_frame, textvariable= target_column_get).grid(row=1, column=1)
     Button(split_data_frame, text= "Confirm Target Selection",command= lambda: select_target()).grid(row=2, column=0, columnspan=2)
+
 
 
 

@@ -325,6 +325,9 @@ def remove_column():
         #Closing & Saving button
         Button(remove_column_window, text= "Close & Save", command=lambda: close_whatever_transform_window(remove_column_window)).grid(row=1010, column=1)   
 
+def feature_scaling():
+    ...
+
 def transform_data():
     transoform_data_frame.pack(side=LEFT, anchor=NW)
 
@@ -365,6 +368,10 @@ def split_data():
                     global x_train, x_test, y_train, y_test
                     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=train_size)
                     submission_successful = messagebox.showinfo("Data Split Sucecessfully", "(x_train, x_test, y_train, y_test) have been created created successfully")
+                    if submission_successful == "ok":
+                        Label(transoform_data_frame).pack()
+                        Label(transoform_data_frame, bg="gray", text="Feature Transformation Methods").pack()
+                        Button(transoform_data_frame, text="Feature Scaling", command=feature_scaling).pack()
                 else:
                     pass
             

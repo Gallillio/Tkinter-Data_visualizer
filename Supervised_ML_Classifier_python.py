@@ -30,12 +30,14 @@ root = Tk()
 file_path = 'change this in function below' #will be reassigned in csv_opener()
 df_original = pd.DataFrame() # this df will not be transformed at all, it will keep original data
 df = pd.DataFrame() #will ve reassigned in csv_opener() / this df will be transformed
+x, y = 0,0
 
 # I keep all frames here incase I want to delete them later
 choose_csv_frame = LabelFrame(root, pady= 6, padx=15)
 treevew_data_frame = LabelFrame(root, padx=40, text="Data Display")
 treevew_has_NA_data_frame = LabelFrame(root, padx=40, text="Does Column have NA")
 transoform_data_frame = LabelFrame(root, padx=20, text="Transform Data")
+split_data_frame = LabelFrame(root, padx=20, text="Split Data")
 
 
 def create_root(project_name):
@@ -66,6 +68,8 @@ def run_code():
     choose_csv_frame.place_forget()
     treeview_of_df()
     transform_data()
+    split_data()
+
 
 def csv_opener():
     #choose CSV File
@@ -84,9 +88,6 @@ def csv_opener():
     #delete choose_csv_frame / Starts Actual Apps
     csv_submission_successful = messagebox.showinfo("Submission Successful", "The data has been submitted successfully")
     if csv_submission_successful == "ok":
-        # choose_csv_frame.place_forget()
-        # treeview_of_df()
-        # transform_data()
         run_code()
 
 def choose_csv():
@@ -124,8 +125,6 @@ def treeview_of_df():
 
     tv.pack()
 
-    #~~ Simple EDA ~~#
-
     #check is_na of all columns
     #create dataframe with data
     data = []
@@ -141,7 +140,7 @@ def treeview_of_df():
     x_scrollbar_has_NA = ttk.Scrollbar(treevew_has_NA_data_frame, orient="horizontal", command=tv_has_NA.xview)
 
     #put frame on grid
-    treevew_has_NA_data_frame.pack(side=LEFT)
+    treevew_has_NA_data_frame.pack(side=LEFT, anchor=NW)
     #put scroll bars
     tv_has_NA.configure(yscrollcommand=y_scrollbar_has_NA.set, xscrollcommand=x_scrollbar_has_NA.set)
 
@@ -229,7 +228,7 @@ def handle_NA():
         title_label.grid(row=0, column=0, columnspan=3)
         # Label(handle_NA_window, bg="lightgray", text ="How to Handle it?").grid(row=1, column=1, columnspan=2)
         Label(handle_NA_window, bg="lightgray", text ="Enter Column Name to Handle").grid(row=1, column=0)
-        column_entry = Entry(handle_NA_window, textvariable= column_to_handle_na).grid(row=1, column=1)
+        Entry(handle_NA_window, textvariable= column_to_handle_na).grid(row=1, column=1)
 
         Label(handle_NA_window, bg="lightgray", text ="Columns").grid(row=2, column=0)
         Label(handle_NA_window, bg="lightgray", text ="Choose How to Handle Column").grid(row=2, column=1)
@@ -250,18 +249,13 @@ def handle_NA():
 
         def replace_all_NA_with_imputer(strategy):
             global df
-            copy_df_for_columns = df.columns
-            imputer = SimpleImputer(strategy=strategy)
-            df = imputer.fit_transform(df)
-            df = pd.DataFrame(df, columns=copy_df_for_columns)
-
             removal_successful = messagebox.showinfo("Filling Successful", "NA cells have been filled successfully in all DataFrame")
             if removal_successful == "ok":
                     close_whatever_transform_window(handle_NA_window)
         def remove_all_NA_row():
             global df
-            for col in df.columns:
-                df.dropna(subset = [col], inplace=True)
+            for column in df.columns:
+                df.dropna(subset = [column], inplace=True)
 
             removal_successful =  messagebox.showinfo("Removal Successful", "The rows has been removed successfully in all DataFrame")
             if removal_successful == "ok":
@@ -276,7 +270,7 @@ def handle_NA():
                 Label(handle_NA_window, text = column).grid(row=i - len(count_skipped_list), column=0)
 
         Button(handle_NA_window, text= "Replace with Mean",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
-        Button(handle_NA_window, text= "Replace with Median",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
+        # Button(handle_NA_window, text= "Replace with Median",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
         Button(handle_NA_window, text= "Remove Entire Row",command= lambda: remove_NA_row()).grid(row=4, column=1)
         Label(handle_NA_window, text= "or").grid(row=5, column=1)
         Button(handle_NA_window, text= "Replace all NA with Mean",command= lambda: replace_all_NA_with_imputer("mean")).grid(row=6, column=1)
@@ -296,11 +290,11 @@ def remove_column():
             messagebox.showinfo("Removal Successful", "The column has been removed successfully")
         def actually_remove_all_non_int_columns():
             global df
-            for col in df.columns:
-                if df[col].dtype == 'int64' or df[col].dtype == 'float64':
+            for column in df.columns:
+                if df[column].dtype == 'int64' or df[column].dtype == 'float64':
                     continue
                 else:
-                    df = df.drop(col, axis=1)
+                    df = df.drop(column, axis=1)
             removal_successful = messagebox.showinfo("Removal Successful", "All non float/int columns have been removed successfully")
             if removal_successful == "ok":
                     close_whatever_transform_window(remove_column_window)
@@ -332,18 +326,39 @@ def remove_column():
         #Closing & Saving button
         Button(remove_column_window, text= "Close & Save", command=lambda: close_whatever_transform_window(remove_column_window)).grid(row=1010, column=1)   
 
-def feature_scaling():
-    ...
-
 def transform_data():
-    transoform_data_frame.pack(side=LEFT)
+    transoform_data_frame.pack(side=LEFT, anchor=NW)
 
     #~~ What actions ~~#
     Button(transoform_data_frame, text="Handle NA", command=handle_NA).pack()
     Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
     Button(transoform_data_frame, text="Remove Column", command=remove_column).pack()
-    Button(transoform_data_frame, text="Feature Scaling", command=feature_scaling).pack()
+    # Button(transoform_data_frame, text="Feature Scaling", command=feature_scaling).pack()
     # Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
+
+def split_data():
+    split_data_frame.pack(side=RIGHT, anchor=NE)
+    target_column_get = StringVar()
+    
+    def select_target():
+        target_column = target_column_get.get()
+
+        # y: target_column, x: all dependant columns
+        global x, y
+        x = df.drop([target_column], axis=1)
+        y = df[target_column]
+        csv_submission_successful = messagebox.showinfo("Data Selection Successful", "Target and Independant Variables have been selected successfully")
+        if csv_submission_successful == "ok":
+            ...
+
+    Label(split_data_frame, text= "Input Target Column: ").grid(row=0, column=0)
+    Entry(split_data_frame, textvariable= target_column_get).grid(row=0, column=1)
+    Button(split_data_frame, text= "Confirm Target Selection",command= lambda: select_target()).grid(row=1, column=0, columnspan=1)
+
+    # input target_column
+    #label : "nope: all the other columns will be selected as the independent variables"
+
+
 
 
 def main() -> int:

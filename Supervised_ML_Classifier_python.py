@@ -194,44 +194,7 @@ def close_whatever_transform_window(transform_window):
         widgets.destroy()
     treeview_of_df()
 
-def encode_columns():
-    column_entry_get = StringVar()
-
-    def actually_encode_column():
-        column_to_encode = column_entry_get.get()
-        label_encoder = LabelEncoder()
-        global df
-        df[column_to_encode] = label_encoder.fit_transform(df[column_to_encode])
-
-        messagebox.showinfo("Encoding Successful", "The data has been encodded successfully")
-
-    #making window
-    encode_columns_window = Toplevel(root, padx=30)
-    encode_columns_window.title("Encoding Columns")
-    encode_columns_window.geometry("440x500")
-    # #make window behind this one unclickable
-    # encode_columns_window.grab_set()
-    # encode_columns_window.transient(root)
-
-    Label(encode_columns_window, text= "Enter Column Name to Encode: ").grid(row=0, column=0)
-    Entry(encode_columns_window, textvariable= column_entry_get).grid(row=0, column=1)
-    Button(encode_columns_window, text= "encode", command= lambda: actually_encode_column()).grid(row=0, column=2)
-
-    #each column
-    Label(encode_columns_window,bg="lightgray", text ="Columns").grid(row=1, column=0)
-    Label(encode_columns_window,bg="lightgray", text ="Column has NA").grid(row=1, column=2)
-
-    for i, column in enumerate(df.columns):
-        column_has_NA = df[column].isna().any()
-        Label(encode_columns_window, text = column).grid(row=i+2, column=0)
-        Label(encode_columns_window, text = column_has_NA).grid(row=i+2, column=2)
-    
-    #Closing & Saving button
-    Button(encode_columns_window, text= "Close & Save", command=lambda: close_whatever_transform_window(encode_columns_window)).grid(row=1010, column=1, columnspan=1)
-
 def handle_NA():
-    column_to_handle_na = StringVar()
-
     #check if any columns have NA
     if df.isnull().any().any() == False:
         messagebox.showinfo("No NA values found", "All columns don't contain any NA")
@@ -309,10 +272,45 @@ def handle_NA():
         Label(handle_NA_window, text= " ").grid(row=1009, column=0)
         Button(handle_NA_window, text= "Close & Save", command=lambda: close_whatever_transform_window(handle_NA_window)).grid(row=1010, column=0, columnspan=2)    
 
+def encode_columns():
+    def actually_encode_column():
+        column_to_encode = column_combobox_get.get()
+        label_encoder = LabelEncoder()
+        global df
+        df[column_to_encode] = label_encoder.fit_transform(df[column_to_encode])
+
+        messagebox.showinfo("Encoding Successful", "The data has been encodded successfully")
+
+    #making window
+    encode_columns_window = Toplevel(root, padx=30)
+    encode_columns_window.title("Encoding Columns")
+    encode_columns_window.geometry("440x500")
+    # #make window behind this one unclickable
+    # encode_columns_window.grab_set()
+    # encode_columns_window.transient(root)
+
+    choices = []
+    for i, column in enumerate(df.columns):
+        choices.append(column)
+        column_has_NA = df[column].isna().any()
+        Label(encode_columns_window, text = column).grid(row=i+2, column=0)
+        Label(encode_columns_window, text = column_has_NA).grid(row=i+2, column=2)
+
+    Label(encode_columns_window, text= "Enter Column Name to Encode: ").grid(row=0, column=0)
+    column_combobox_get = ttk.Combobox(encode_columns_window, values= choices)
+    column_combobox_get.grid(row=0, column=1)
+    Button(encode_columns_window, text= "encode", command= lambda: actually_encode_column()).grid(row=0, column=2)
+
+    #each column
+    Label(encode_columns_window,bg="lightgray", text ="Columns").grid(row=1, column=0)
+    Label(encode_columns_window,bg="lightgray", text ="Column has NA").grid(row=1, column=2)
+    
+    #Closing & Saving button
+    Button(encode_columns_window, text= "Close & Save", command=lambda: close_whatever_transform_window(encode_columns_window)).grid(row=1010, column=1, columnspan=1)
+
 def remove_column():
-        column_entry_get = StringVar()
         def actually_remove_column():
-            column_to_remove = column_entry_get.get()
+            column_to_remove = column_combobox_get.get()
             global df
             df = df.drop(column_to_remove, axis=1)
 
@@ -336,18 +334,21 @@ def remove_column():
         # remove_column_window.grab_set()
         # remove_column_window.transient(root)
 
+        choices = []
+        for i, column in enumerate(df.columns):
+            choices.append(column)
+            column_dtype = df[column].dtype
+            Label(remove_column_window, text = column).grid(row=i+2, column=0)
+            Label(remove_column_window, text = column_dtype).grid(row=i+2, column=1)
+
         Label(remove_column_window, text= "Enter Column Name to Remove: ").grid(row=0, column=0)
-        Entry(remove_column_window, textvariable= column_entry_get).grid(row=0, column=1)
+        column_combobox_get = ttk.Combobox(remove_column_window, values= choices)
+        column_combobox_get.grid(row=0, column=1)
         Button(remove_column_window, text= "Remove Column", command= actually_remove_column).grid(row=0, column=2)
 
         #each column
         Label(remove_column_window,bg="lightgray", text ="Columns").grid(row=1, column=0)
         Label(remove_column_window,bg="lightgray", text ="Column dtype").grid(row=1, column=1)
-
-        for i, column in enumerate(df.columns):
-            column_dtype = df[column].dtype
-            Label(remove_column_window, text = column).grid(row=i+2, column=0)
-            Label(remove_column_window, text = column_dtype).grid(row=i+2, column=1)
 
         Label(remove_column_window,bg="lightgray", text ="or").grid(row=1, column=2)
         Button(remove_column_window, text= "Remove all non \n float/int columns", command= actually_remove_all_non_int_columns).grid(row=2, column=2)
@@ -356,30 +357,32 @@ def remove_column():
         Button(remove_column_window, text= "Close & Save", command=lambda: close_whatever_transform_window(remove_column_window)).grid(row=1010, column=1)   
 
 def remove_duplicates():
-    column_entry_get = StringVar()
-
     #making window
     remove_duplicates_window = Toplevel(root, padx=30)
     remove_duplicates_window.title("Remove Duplicates")
     remove_duplicates_window.geometry("450x500")
     def actually_remove_duplicates():
-        column_entry = column_entry_get.get()
+        column_entry = column_combobox_get.get()
         global df
         df = df.drop_duplicates(subset=[column_entry])
 
         removal_successful = messagebox.showinfo("Removed Duplicates Successful", "The duplicated data has been removed successfully")
         if removal_successful == "ok":
-                close_whatever_transform_window(remove_duplicates_window)
+            close_whatever_transform_window(remove_duplicates_window)
+    choices = []
+    for i, column in enumerate(df.columns):
+        choices.append(column)
+        Label(remove_duplicates_window, text = column).grid(row=i+2, column=0, columnspan=2)
 
     Label(remove_duplicates_window, text= "Enter Column to Remove Duplicates From: ").grid(row=0, column=0)
-    Entry(remove_duplicates_window, textvariable= column_entry_get).grid(row=0, column=1)
+    column_combobox_get = ttk.Combobox(remove_duplicates_window, values= choices)
+    column_combobox_get.grid(row=0, column=1)
+    Label(remove_duplicates_window, bg="lightgray", text= "Columns: ").grid(row=1, column=0, columnspan=2)
     Button(remove_duplicates_window, text= "Remove", command= lambda: actually_remove_duplicates()).grid(row=1, column=1)
+    Label(remove_duplicates_window, text= "").grid(row=2, column=1)
+    Button(remove_duplicates_window, text= "Create Index Column", command= lambda: create_index_column(remove_duplicates_window)).grid(row=3, column=1)
 
-    for i, column in enumerate(df.columns):
-        duplicated_rows_count = len(df[df.duplicated([column])])
-        Label(remove_duplicates_window, text = column).grid(row=i+1, column=0, columnspan=2)
-
-def create_index_column():
+def create_index_column(remove_duplicates_window):
     #create index column
     global df
     df["index"] = df.index
@@ -398,6 +401,9 @@ def create_index_column():
             for widgets in treevew_has_NA_data_frame.winfo_children():
                 widgets.destroy()
             treeview_of_df()
+        
+    #incase this function is run inside remove_duplicates(), have to delete remove_duplicates_window and create it again
+    remove_duplicates_window.destroy()
 
 def transform_data():
     transoform_data_frame.pack(side=LEFT, anchor=NW)
@@ -407,7 +413,7 @@ def transform_data():
     Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
     Button(transoform_data_frame, text="Remove Column", command=remove_column).pack()
     Button(transoform_data_frame, text="Remove Duplicates", command=remove_duplicates).pack()
-    Button(transoform_data_frame, text="Create Index Column", command=create_index_column).pack()
+    Button(transoform_data_frame, text="Create Index Column", command=lambda: create_index_column(None)).pack()
 
 def standard_scaler():
     scaler = StandardScaler()

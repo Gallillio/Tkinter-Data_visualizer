@@ -408,7 +408,7 @@ def create_index_column(remove_duplicates_window):
     # incase this function is run inside remove_duplicates(), have to delete remove_duplicates_window and create it again
     remove_duplicates_window.destroy()
     remove_duplicates()
-
+    
 def transform_data():
     transoform_data_frame.pack(side=LEFT, anchor=NW)
 

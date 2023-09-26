@@ -385,25 +385,29 @@ def remove_duplicates():
 def create_index_column(remove_duplicates_window):
     #create index column
     global df
-    df["index"] = df.index
-    #rearrange columns and put index column first
-    new_order = ['index']
-    for column in df.columns[:-1]:
-        new_order.append(column)
-    df = df.reindex(columns=new_order)
+    if "index" in df.columns:
+        messagebox.showerror("Index already exists", "A column with the name 'index' already exists, please rename that column and try again")
+    else:
+        df["index"] = df.index
+        #rearrange columns and put index column first
+        new_order = ['index']
+        for column in df.columns[:-1]:
+            new_order.append(column)
+        df = df[new_order]
 
-    removal_successful = messagebox.showinfo("Column Created Successfully", "Index Column has been created successfully")
-    if removal_successful == "ok":
-            #delete old treeview and repack it
-            for widgets in treevew_data_frame.winfo_children():
-                widgets.destroy()
-            #deletes old 
-            for widgets in treevew_has_NA_data_frame.winfo_children():
-                widgets.destroy()
-            treeview_of_df()
+        removal_successful = messagebox.showinfo("Column Created Successfully", "Index Column has been created successfully")
+        if removal_successful == "ok":
+                #delete old treeview and repack it
+                for widgets in treevew_data_frame.winfo_children():
+                    widgets.destroy()
+                #deletes old 
+                for widgets in treevew_has_NA_data_frame.winfo_children():
+                    widgets.destroy()
+                treeview_of_df()
         
-    #incase this function is run inside remove_duplicates(), have to delete remove_duplicates_window and create it again
+    # incase this function is run inside remove_duplicates(), have to delete remove_duplicates_window and create it again
     remove_duplicates_window.destroy()
+    remove_duplicates()
 
 def transform_data():
     transoform_data_frame.pack(side=LEFT, anchor=NW)

@@ -58,7 +58,7 @@ def create_root(project_name):
     # width= root.winfo_screenwidth()               
     # height= root.winfo_screenheight()
     # root.geometry("%dx%d" % (width, height))
-    root.geometry("1400x700")
+    root.geometry("1400x700+500+300")
     # root.resizable(False,False)
 
 def root_loop() -> int:
@@ -172,7 +172,6 @@ def EDA():
     column_is_categorical = []
     column_is_numaric = []
     for column in df.columns:
-        print(column, len(df[column].unique()))
         if len(df[column].unique()) == 2:
             column_is_categorical.append(column)
         else:
@@ -249,12 +248,19 @@ def handle_NA():
         #title at top
         title_label = Label(handle_NA_window, bg="gray", padx = 105, text = "Columns Containing NA")
         title_label.grid(row=0, column=0, columnspan=3)
-        # Label(handle_NA_window, bg="lightgray", text ="How to Handle it?").grid(row=1, column=1, columnspan=2)
-        Label(handle_NA_window, bg="lightgray", text ="Enter Column Name to Handle").grid(row=1, column=0)
-        Entry(handle_NA_window, textvariable= column_to_handle_na).grid(row=1, column=1)
+        
+        choices = []
+        for column in df.columns:
+            if df[column].isna().any() == False:
+                continue
+            else:
+                choices.append(column)
 
-        Label(handle_NA_window, bg="lightgray", text ="Columns").grid(row=2, column=0)
-        Label(handle_NA_window, bg="lightgray", text ="Choose How to Handle Column").grid(row=2, column=1)
+        Label(handle_NA_window, bg="lightgray", text ="Choose Column Name to Handle").grid(row=1, column=0)
+        column_to_handle_na = ttk.Combobox(handle_NA_window, values= choices)
+        column_to_handle_na.grid(row=1, column=1)
+
+        Label(handle_NA_window, bg="lightgray", text ="Choose How to Handle Column").grid(row=2, column=0, columnspan=2)
 
         def replace_NA_with_mean():
             column_to_handle = column_to_handle_na.get()
@@ -263,6 +269,13 @@ def handle_NA():
             mean = df[column_to_handle].mean()
             df[column_to_handle].fillna(value=mean, inplace=True)
             messagebox.showinfo("Filling Successful", "NA cells have been filled with mean successfully in the column")
+        def replace_NA_with_median():
+            column_to_handle = column_to_handle_na.get()
+
+            global df
+            median = df[column_to_handle].median()
+            df[column_to_handle].fillna(value=median, inplace=True)
+            messagebox.showinfo("Filling Successful", "NA cells have been filled with median successfully in the column")
         def remove_NA_row():
             column_to_handle = column_to_handle_na.get()
 
@@ -272,7 +285,7 @@ def handle_NA():
 
         def replace_all_NA_with_imputer(strategy):
             global df
-            removal_successful = messagebox.showinfo("Filling Successful", "NA cells have been filled successfully in all DataFrame")
+            removal_successful = messagebox.showinfo("Filling Successful", f"NA cells have been filled with {strategy} successfully in all DataFrame")
             if removal_successful == "ok":
                     close_whatever_transform_window(handle_NA_window)
         def remove_all_NA_row():
@@ -284,24 +297,17 @@ def handle_NA():
             if removal_successful == "ok":
                 close_whatever_transform_window(handle_NA_window)
 
-        count_skipped_list = [] #this list will be used to count how many times the loop was skipped (continue) so that the unskipped Labels print in the correct grid
-        for i, column in enumerate(df.columns, start= 3):
-            if df[column].isna().any() == False:
-                count_skipped_list.append(1)
-                continue
-            else:
-                Label(handle_NA_window, text = column).grid(row=i - len(count_skipped_list), column=0)
-
-        Button(handle_NA_window, text= "Replace with Mean",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
+        Button(handle_NA_window, text= "Replace with Mean",command= lambda: replace_NA_with_mean()).grid(row=3, column=0, columnspan=2)
         # Button(handle_NA_window, text= "Replace with Median",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
-        Button(handle_NA_window, text= "Remove Entire Row",command= lambda: remove_NA_row()).grid(row=4, column=1)
-        Label(handle_NA_window, text= "or").grid(row=5, column=1)
-        Button(handle_NA_window, text= "Replace all NA with Mean",command= lambda: replace_all_NA_with_imputer("mean")).grid(row=6, column=1)
-        Button(handle_NA_window, text= "Replace all NA with Median",command= lambda: replace_all_NA_with_imputer("median")).grid(row=7, column=1)
-        Button(handle_NA_window, text= "Remove all NA rows Entirely",command= lambda: remove_all_NA_row()).grid(row=8, column=1)
+        Button(handle_NA_window, text= "Remove Entire Row",command= lambda: remove_NA_row()).grid(row=4, column=0, columnspan=2)
+        Label(handle_NA_window, text= "or").grid(row=5, column=0, columnspan=2)
+        Button(handle_NA_window, text= "Replace all NA with Mean",command= lambda: replace_all_NA_with_imputer("mean")).grid(row=6, column=0, columnspan=2)
+        Button(handle_NA_window, text= "Replace all NA with Median",command= lambda: replace_all_NA_with_imputer("median")).grid(row=7, column=0, columnspan=2)
+        Button(handle_NA_window, text= "Remove all NA rows Entirely",command= lambda: remove_all_NA_row()).grid(row=8, column=0, columnspan=2)
 
         #Closing & Saving button
-        Button(handle_NA_window, text= "Close & Save", command=lambda: close_whatever_transform_window(handle_NA_window)).grid(row=1010, column=1)    
+        Label(handle_NA_window, text= " ").grid(row=1009, column=0)
+        Button(handle_NA_window, text= "Close & Save", command=lambda: close_whatever_transform_window(handle_NA_window)).grid(row=1010, column=0, columnspan=2)    
 
 def remove_column():
         column_entry_get = StringVar()

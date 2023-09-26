@@ -217,7 +217,6 @@ def encode_columns():
     Label(encode_columns_window, text= "Enter Column Name to Encode: ").grid(row=0, column=0)
     Entry(encode_columns_window, textvariable= column_entry_get).grid(row=0, column=1)
     Button(encode_columns_window, text= "encode", command= lambda: actually_encode_column()).grid(row=0, column=2)
-    encode_columns_window
 
     #each column
     Label(encode_columns_window,bg="lightgray", text ="Columns").grid(row=1, column=0)
@@ -350,6 +349,50 @@ def remove_column():
         #Closing & Saving button
         Button(remove_column_window, text= "Close & Save", command=lambda: close_whatever_transform_window(remove_column_window)).grid(row=1010, column=1)   
 
+def remove_duplicates():
+    column_entry_get = StringVar()
+
+    #making window
+    remove_duplicates_window = Toplevel(root, padx=30)
+    remove_duplicates_window.title("Remove Duplicates")
+    remove_duplicates_window.geometry("450x500")
+    def actually_remove_duplicates():
+        column_entry = column_entry_get.get()
+        global df
+        df = df.drop_duplicates(subset=[column_entry])
+
+        removal_successful = messagebox.showinfo("Removed Duplicates Successful", "The duplicated data has been removed successfully")
+        if removal_successful == "ok":
+                close_whatever_transform_window(remove_duplicates_window)
+
+    Label(remove_duplicates_window, text= "Enter Column to Remove Duplicates From: ").grid(row=0, column=0)
+    Entry(remove_duplicates_window, textvariable= column_entry_get).grid(row=0, column=1)
+    Button(remove_duplicates_window, text= "Remove", command= lambda: actually_remove_duplicates()).grid(row=1, column=1)
+
+    for i, column in enumerate(df.columns):
+        duplicated_rows_count = len(df[df.duplicated([column])])
+        Label(remove_duplicates_window, text = column).grid(row=i+1, column=0, columnspan=2)
+
+def create_index_column():
+    #create index column
+    global df
+    df["index"] = df.index
+    #rearrange columns and put index column first
+    new_order = ['index']
+    for column in df.columns[:-1]:
+        new_order.append(column)
+    df = df.reindex(columns=new_order)
+
+    removal_successful = messagebox.showinfo("Column Created Successfully", "Index Column has been created successfully")
+    if removal_successful == "ok":
+            #delete old treeview and repack it
+            for widgets in treevew_data_frame.winfo_children():
+                widgets.destroy()
+            #deletes old 
+            for widgets in treevew_has_NA_data_frame.winfo_children():
+                widgets.destroy()
+            treeview_of_df()
+
 def transform_data():
     transoform_data_frame.pack(side=LEFT, anchor=NW)
 
@@ -357,8 +400,8 @@ def transform_data():
     Button(transoform_data_frame, text="Handle NA", command=handle_NA).pack()
     Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
     Button(transoform_data_frame, text="Remove Column", command=remove_column).pack()
-    # Button(transoform_data_frame, text="Feature Scaling", command=feature_scaling).pack()
-    # Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
+    Button(transoform_data_frame, text="Remove Duplicates", command=remove_duplicates).pack()
+    Button(transoform_data_frame, text="Create Index Column", command=create_index_column).pack()
 
 def standard_scaler():
     scaler = StandardScaler()

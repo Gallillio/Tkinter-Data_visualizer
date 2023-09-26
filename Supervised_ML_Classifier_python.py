@@ -42,6 +42,7 @@ treevew_data_frame = LabelFrame(root, padx=40, text="Data Display")
 treevew_has_NA_data_frame = LabelFrame(root, padx=40, text="Does Column have NA")
 transoform_data_frame = LabelFrame(root, padx=20, text="Transform Data")
 split_data_frame = LabelFrame(root, padx=20, text="Split Data")
+EDA_frame = LabelFrame(root, padx=20, text="EDA")
 
 
 def create_root(project_name):
@@ -71,6 +72,7 @@ def root_loop() -> int:
 def run_code():
     choose_csv_frame.place_forget()
     treeview_of_df()
+    EDA()
     transform_data()
     split_data()
 
@@ -131,10 +133,10 @@ def treeview_of_df():
     #create dataframe with data
     data = []
     for column in df.columns:
-        column_has_na_list = [column, df[column].isna().any()]
+        column_has_na_list = [column, df[column].isna().any(), df[column].isna().sum(), f"{round(df[column].isna().sum() * 100 / len(df[column]), 4)} %"]
         data.append(column_has_na_list)
         
-    df_has_NA = pd.DataFrame(data, columns=["column_name", "column_has_NA"])
+    df_has_NA = pd.DataFrame(data, columns=["Column Name", "Column Has NA", "Count of NA Cells", "% of NA Cells"])
 
     # create tree view to show each column and if it has NA values
     tv_has_NA = ttk.Treeview(treevew_has_NA_data_frame)
@@ -162,6 +164,26 @@ def treeview_of_df():
 
     tv_has_NA.pack()
 
+def EDA():
+    EDA_frame.pack(side=TOP, anchor=NW)
+    empty_space_label = Label(EDA_frame, text = "     ")
+
+    #check if column is categorical or numaric
+    column_is_categorical = []
+    column_is_numaric = []
+    for column in df.columns:
+        print(column, len(df[column].unique()))
+        if len(df[column].unique()) == 2:
+            column_is_categorical.append(column)
+        else:
+            column_is_numaric.append(column)
+
+    Label(EDA_frame, text = f"Number of Features: {len(df.columns)}").grid(row=0, column=0)
+    Label(EDA_frame, text = f"Number of Rows: {len(df)}").grid(row=1, column=0)
+    empty_space_label.grid(row=0, column=1)
+    Label(EDA_frame, text = f"Number of Numaric Columns: {len(column_is_numaric)}").grid(row=0, column=2)
+    Label(EDA_frame, text = f"Number of Categorical Columns: {len(column_is_categorical)}").grid(row=1, column=2)
+
 def close_whatever_transform_window(transform_window):
     transform_window.destroy()
 
@@ -188,9 +210,9 @@ def encode_columns():
     encode_columns_window = Toplevel(root, padx=30)
     encode_columns_window.title("Encoding Columns")
     encode_columns_window.geometry("440x500")
-    #make window behind this one unclickable
-    encode_columns_window.grab_set()
-    encode_columns_window.transient(root)
+    # #make window behind this one unclickable
+    # encode_columns_window.grab_set()
+    # encode_columns_window.transient(root)
 
     Label(encode_columns_window, text= "Enter Column Name to Encode: ").grid(row=0, column=0)
     Entry(encode_columns_window, textvariable= column_entry_get).grid(row=0, column=1)
@@ -221,9 +243,9 @@ def handle_NA():
         handle_NA_window.title("Handle NA")
         handle_NA_window.geometry("420x500")
 
-        #make window behind this one unclickable
-        handle_NA_window.grab_set()
-        handle_NA_window.transient(root)
+        # #make window behind this one unclickable
+        # handle_NA_window.grab_set()
+        # handle_NA_window.transient(root)
 
         #title at top
         title_label = Label(handle_NA_window, bg="gray", padx = 105, text = "Columns Containing NA")
@@ -305,9 +327,9 @@ def remove_column():
         remove_column_window.title("Remove Column")
         remove_column_window.geometry("460x500")
 
-        #make window behind this one unclickable
-        remove_column_window.grab_set()
-        remove_column_window.transient(root)
+        # #make window behind this one unclickable
+        # remove_column_window.grab_set()
+        # remove_column_window.transient(root)
 
         Label(remove_column_window, text= "Enter Column Name to Remove: ").grid(row=0, column=0)
         Entry(remove_column_window, textvariable= column_entry_get).grid(row=0, column=1)
@@ -342,7 +364,6 @@ def standard_scaler():
     scaler = StandardScaler()
     x_train_scaled = scaler.fit_transform(x_train)
     x_test_scaled = scaler.transform(x_test) #using same mean used in scaling x_train
-
 
 def split_data():
     split_data_frame.pack(side=RIGHT, anchor=NE)

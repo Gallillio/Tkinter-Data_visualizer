@@ -58,7 +58,7 @@ def create_root(project_name):
     # width= root.winfo_screenwidth()               
     # height= root.winfo_screenheight()
     # root.geometry("%dx%d" % (width, height))
-    root.geometry("1400x700+500+300")
+    root.geometry("1100x600+300+100")
     # root.resizable(False,False)
 
 def root_loop() -> int:
@@ -164,24 +164,104 @@ def treeview_of_df():
 
     tv_has_NA.pack()
 
+def detailed_EDA():    
+    detailed_EDA_window = Toplevel(root, padx=30)
+    detailed_EDA_window.title("Handle NA")
+    detailed_EDA_window.geometry("470x500")
+
+    detailed_EDA_frame = LabelFrame(detailed_EDA_window) #will be used in display_detailed_EDA()
+
+    Label(detailed_EDA_window, bg="gray", padx = 105, text = "Detailed Column EDA").grid(row=0, column=0, columnspan=3)
+
+    choices = []
+    for i, column in enumerate(df.columns):
+        choices.append(column)
+
+    Label(detailed_EDA_window, text = "Choose Column to view more about").grid(row=1, column=0)
+    column_combobox_get = ttk.Combobox(detailed_EDA_window, values= choices)
+    column_combobox_get.grid(row=1, column=1)
+    Button(detailed_EDA_window, text= "Display More", command= lambda: display_detailed_EDA(column_combobox_get.get())).grid(row=1, column=2)
+    
+    Label(detailed_EDA_window, text=" ").grid(row=2, column=0)
+    def display_detailed_EDA(column):
+        #delete frame and rebuild it (incase user changes column)
+        for widgets in detailed_EDA_frame.winfo_children():
+            widgets.destroy()
+        detailed_EDA_frame.grid(row=3, column=0, columnspan=3)
+
+        def statistics_detailed_EDA(column):
+            Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
+            #min value
+            Label(detailed_EDA_frame, text="Minimum: ").grid(row=3, column=0, columnspan=2)
+            Label(detailed_EDA_frame, text= min(df[column])).grid(row=3, column=1, columnspan=2)
+            #max value
+            Label(detailed_EDA_frame, text="Maximum: ").grid(row=4, column=0, columnspan=2)
+            Label(detailed_EDA_frame, text= max(df[column])).grid(row=4, column=1, columnspan=2)
+            #distance value
+            Label(detailed_EDA_frame, text="Distinct: ").grid(row=3, column=2, columnspan=2)
+            Label(detailed_EDA_frame, text= len(pd.unique(df[column]))).grid(row=3, column=3, columnspan=2)
+            #distance percentage
+            Label(detailed_EDA_frame, text="Distinct (%): ").grid(row=4, column=2, columnspan=2)
+            distinct_percentage = round((len(pd.unique(df[column])) / len(df[column])) * 100, 1)
+            Label(detailed_EDA_frame, text= f"{distinct_percentage}%").grid(row=4, column=3, columnspan=2)
+            #mean value
+            Label(detailed_EDA_frame, text="Mean: ").grid(row=5, column=0, columnspan=2)
+            Label(detailed_EDA_frame, text= round(df[column].mean(), 3)).grid(row=5, column=1, columnspan=2)
+            #median value
+            Label(detailed_EDA_frame, text="Median: ").grid(row=6, column=0, columnspan=2)
+            Label(detailed_EDA_frame, text= round(df[column].median(), 3)).grid(row=6, column=1, columnspan=2)
+            #missing value
+            Label(detailed_EDA_frame, text="Missing: ").grid(row=5, column=2, columnspan=2)
+            Label(detailed_EDA_frame, text= df[column].isna().sum()).grid(row=5, column=3, columnspan=2)
+            #missing percentage
+            Label(detailed_EDA_frame, text="Missing(%): ").grid(row=6, column=2, columnspan=2)
+            missing_percentage = round((df[column].isna().sum() / len(df[column])) * 100, 1)
+            Label(detailed_EDA_frame, text= f"{missing_percentage}%").grid(row=6, column=3, columnspan=2)
+            #sum value
+            Label(detailed_EDA_frame, text="Sum: ").grid(row=7, column=0, columnspan=2)
+            Label(detailed_EDA_frame, text= round(df[column].sum(), 3)).grid(row=7, column=1, columnspan=2)
+            #standard diviation value
+            Label(detailed_EDA_frame, text="STD: ").grid(row=7, column=2, columnspan=2)
+            Label(detailed_EDA_frame, text= round(df[column].std(), 3)).grid(row=7, column=3, columnspan=2)
+
+
+        #build statistics_detailed_EDA() automatically
+        statistics_detailed_EDA(column)
+
+        Label(detailed_EDA_frame, bg="lightgray", text= column, padx=105).grid(row=0, column=0, columnspan=4)
+        Button(detailed_EDA_frame, text="Statistics", command=lambda: statistics_detailed_EDA(column)).grid(row=1, column=0)
+        Button(detailed_EDA_frame, text="Histogram").grid(row=1, column=1)
+        Button(detailed_EDA_frame, text="Common Values").grid(row=1, column=2)
+        Button(detailed_EDA_frame, text="Extreme Values").grid(row=1, column=3)
+
+
 def EDA():
     EDA_frame.pack(side=TOP, anchor=NW)
     empty_space_label = Label(EDA_frame, text = "     ")
 
-    #check if column is categorical or numaric
+    #check if column is categorical or numaric or bool
     column_is_categorical = []
     column_is_numaric = []
+    column_is_bool = []
     for column in df.columns:
-        if len(df[column].unique()) == 2:
+        #check if bool                                                     this checks if the unique() outcome is actually 0 & 1 or if it this column just happens to contain only 2 unique rows that could be not a bool
+        if df[column].dtype == np.dtype('bool') or (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique()) ):
+            column_is_bool.append(column)
+        #check if object
+        elif df[column].dtype == np.dtype('O'):
             column_is_categorical.append(column)
-        else:
+        #check if float or int
+        elif df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32'):
             column_is_numaric.append(column)
 
     Label(EDA_frame, text = f"Number of Features: {len(df.columns)}").grid(row=0, column=0)
     Label(EDA_frame, text = f"Number of Rows: {len(df)}").grid(row=1, column=0)
+    Label(EDA_frame, text = f"Number of Missing Cells: {df.isnull().sum().sum()}").grid(row=2, column=0)
+    Button(EDA_frame, text="More Detailed EDA", command=detailed_EDA).grid(row=3, column=0, columnspan=3)
     empty_space_label.grid(row=0, column=1)
     Label(EDA_frame, text = f"Number of Numaric Columns: {len(column_is_numaric)}").grid(row=0, column=2)
-    Label(EDA_frame, text = f"Number of Categorical Columns: {len(column_is_categorical)}").grid(row=1, column=2)
+    Label(EDA_frame, text = f"Number of Boolean Columns: {len(column_is_bool)}").grid(row=1, column=2)
+    Label(EDA_frame, text = f"Number of Categorical Columns: {len(column_is_categorical)}").grid(row=2, column=2)
 
 def close_whatever_transform_window(transform_window):
     transform_window.destroy()
@@ -356,6 +436,40 @@ def remove_column():
         #Closing & Saving button
         Button(remove_column_window, text= "Close & Save", command=lambda: close_whatever_transform_window(remove_column_window)).grid(row=1010, column=1)   
 
+def rename_column():
+    new_column_name_get = StringVar()
+    
+    #making window
+    rename_column_window = Toplevel(root, padx=30)
+    rename_column_window.title("Rename Column")
+    rename_column_window.geometry("430x500")
+
+    def actually_rename_column():
+        new_column_name = new_column_name_get.get()
+        column_to_rename = column_combobox_get.get()
+        global df
+        df.rename(columns = {f'{column_to_rename}':f'{new_column_name}'}, inplace = True)
+
+        removal_successful = messagebox.showinfo("Removed Duplicates Successful", "The duplicated data has been removed successfully")
+        if removal_successful == "ok":
+            # close_whatever_transform_window(remove_duplicates_window)
+            rename_column_window.destroy()
+            rename_column()
+    def save_and_close():
+        close_whatever_transform_window(rename_column_window)
+
+    choices = []
+    for i, column in enumerate(df.columns):
+        choices.append(column)
+    Label(rename_column_window, text= "Choose Column to Rename: ").grid(row=0, column=0)
+    Label(rename_column_window, text= "Rename Column to: ").grid(row=1, column=0)
+    column_combobox_get = ttk.Combobox(rename_column_window, values= choices)
+    column_combobox_get.grid(row=0, column=1)
+    Entry(rename_column_window, textvariable= new_column_name_get).grid(row=1, column=1)
+
+    Button(rename_column_window, text= "Rename Column", command= actually_rename_column).grid(row=2, column=0, columnspan=2)
+    Button(rename_column_window, text= "Save & Close", command= save_and_close).grid(row=3, column=0, columnspan=2)
+
 def remove_duplicates():
     #making window
     remove_duplicates_window = Toplevel(root, padx=30)
@@ -381,6 +495,7 @@ def remove_duplicates():
     Button(remove_duplicates_window, text= "Remove", command= lambda: actually_remove_duplicates()).grid(row=1, column=1)
     Label(remove_duplicates_window, text= "").grid(row=2, column=1)
     Button(remove_duplicates_window, text= "Create Index Column", command= lambda: create_index_column(remove_duplicates_window)).grid(row=3, column=1)
+    Button(remove_duplicates_window, text= "Rename Column", command= lambda: actually_remove_duplicates()).grid(row=1, column=1)
 
 def create_index_column(remove_duplicates_window):
     #create index column
@@ -408,7 +523,7 @@ def create_index_column(remove_duplicates_window):
     # incase this function is run inside remove_duplicates(), have to delete remove_duplicates_window and create it again
     remove_duplicates_window.destroy()
     remove_duplicates()
-    
+
 def transform_data():
     transoform_data_frame.pack(side=LEFT, anchor=NW)
 
@@ -416,6 +531,7 @@ def transform_data():
     Button(transoform_data_frame, text="Handle NA", command=handle_NA).pack()
     Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
     Button(transoform_data_frame, text="Remove Column", command=remove_column).pack()
+    Button(transoform_data_frame, text="Rename Column", command=rename_column).pack()
     Button(transoform_data_frame, text="Remove Duplicates", command=remove_duplicates).pack()
     Button(transoform_data_frame, text="Create Index Column", command=lambda: create_index_column(None)).pack()
 
@@ -425,7 +541,7 @@ def standard_scaler():
     x_test_scaled = scaler.transform(x_test) #using same mean used in scaling x_train
 
 def split_data():
-    split_data_frame.pack(side=RIGHT, anchor=NE)
+    split_data_frame.pack(side=TOP, anchor=NW)
     target_column_get = StringVar()
     train_size_get = StringVar()
     
@@ -439,9 +555,9 @@ def split_data():
         submission_successful = messagebox.showinfo("Data Selection Successful", "Target and Independant Variables have been selected successfully")
         if submission_successful == "ok":
             #reset split_data_frame
-            for widgets in split_data_frame.winfo_children():
-                widgets.destroy()
-            split_data()
+            # for widgets in split_data_frame.winfo_children():
+            #     widgets.destroy()
+            # split_data()
             #show current Target Value
             Label(split_data_frame, text= "Selected Target Column: ").grid(row=3, column=0)
             Label(split_data_frame, text= target_column).grid(row=3, column=1)

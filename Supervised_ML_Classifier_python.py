@@ -256,6 +256,8 @@ def detailed_EDA():
             Button(detailed_EDA_frame, text="Confirm", command=lambda: change_bin_size()).grid(row=3, column=2)
             Button(detailed_EDA_frame, text="Or use freedman diaconis", command=lambda: graph_using_freedman_diaconis()).grid(row=3, column=3)
             def graph_using_freedman_diaconis():
+                global bin_size
+                bin_size = True
                 fig, ax = plt.subplots()
                 canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
                 # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
@@ -277,9 +279,10 @@ def detailed_EDA():
                     canvas.draw()
                 except ValueError:
                     messagebox.showerror('Could not complete freedman diaconis calculation', 'Calculating freedman diaconis was unsuccessful, \nIt seems that there are some NaN values, please remove them before graphing. \nOR \nInput bin size mangually.')
-
+            bin_size = True #used to detect if custom bin sized is used (so if graph_externally() is run we graph the new bin graph)
             def change_bin_size():
                 try:
+                    global bin_size
                     bin_size = int(bin_size_get.get())
                     
                     fig, ax = plt.subplots()
@@ -302,14 +305,21 @@ def detailed_EDA():
 
             #extra features to edit graph
             def graph_externally(column):
-                fig, ax = plt.subplots()
-                #calculate bins using 
-                Q75, Q25 = np.percentile(df[column], [75 ,25])
-                IQR = Q75 - Q25
-                bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
-                num_bins = int((max(df[column]) - min(df[column])) / bin_width)
-                ax.hist(df[column], bins=num_bins, rwidth=0.7)
-                fig.show()
+                #if bin_size isnt custom made
+                global bin_size
+                if bin_size != True:
+                    fig, ax = plt.subplots()
+                    ax.hist(df[column], bins=bin_size, rwidth=0.7)
+                    fig.show()
+                else:
+                    fig, ax = plt.subplots()
+                    #calculate bins using 
+                    Q75, Q25 = np.percentile(df[column], [75 ,25])
+                    IQR = Q75 - Q25
+                    bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                    num_bins = int((max(df[column]) - min(df[column])) / bin_width)
+                    ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                    fig.show()
             def display_count_graph(column):
                 #rebuild Canvas
                 fig, ax = plt.subplots()

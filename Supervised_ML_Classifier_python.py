@@ -186,7 +186,7 @@ def detailed_EDA():
     Label(detailed_EDA_window, text=" ").grid(row=2, column=0)
     def display_detailed_EDA(column):
         def nav_bar():
-            Label(detailed_EDA_frame, bg="lightgray", text= column, padx=105).grid(row=0, column=0, columnspan=4)
+            Label(detailed_EDA_frame, bg="lightgray", text= column, padx=105).grid(row=0, column=0, columnspan=5)
             Button(detailed_EDA_frame, text="Statistics", command=lambda: statistics_detailed_EDA(column)).grid(row=1, column=0)
             Button(detailed_EDA_frame, text="Histogram", command=lambda: histogram_detailed_EDA(column)).grid(row=1, column=1)
             Button(detailed_EDA_frame, text="Common Values").grid(row=1, column=2)
@@ -246,24 +246,119 @@ def detailed_EDA():
             rebuild_everything_in_detailed_EDA_frame()
 
             #change geometry
-            detailed_EDA_window.geometry("700x660")
+            detailed_EDA_window.geometry("700x705")
 
+            #change bin size
+            bin_size_get = StringVar()
             Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
-            # Initialize Tkinter and Matplotlib Figure
-            fig, ax = plt.subplots()
-            canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
-            # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
-            canvas.get_tk_widget().grid(row= 3, column= 0, columnspan= 5)
-            # Plot data on Matplotlib Figure
-            ax.hist(df[column], bins=50, rwidth=0.7)
-            # ax.hist(df[column], bins=num_bins, rwidth=0.7)
+            Label(detailed_EDA_frame, text="Enter New Bin Size").grid(row=3, column=0)
+            Entry(detailed_EDA_frame, textvariable= bin_size_get).grid(row=3, column=1)
+            Button(detailed_EDA_frame, text="Confirm", command=lambda: change_bin_size()).grid(row=3, column=2)
+            Button(detailed_EDA_frame, text="Or use freedman diaconis", command=lambda: graph_using_freedman_diaconis()).grid(row=3, column=3)
+            def graph_using_freedman_diaconis():
+                fig, ax = plt.subplots()
+                canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
+                # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+                canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
+                # Plot data on Matplotlib Figure
+                try:
+                    #calculate bins using 
+                    Q75, Q25 = np.percentile(df[column], [75 ,25])
+                    IQR = Q75 - Q25
+                    bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                    num_bins = int((max(df[column]) - min(df[column])) / bin_width)
+                    ax.hist(df[column], bins=num_bins, rwidth=0.7)
 
-            # Add labels and title
-            plt.xlabel(column)
-            plt.ylabel('Frequency')
-            plt.title(f'{column} Histogram')
-            
-            canvas.draw()
+                    # Add labels and title
+                    plt.xlabel(column)
+                    plt.ylabel('Frequency')
+                    plt.title(f'{column} Histogram')
+                    
+                    canvas.draw()
+                except ValueError:
+                    messagebox.showerror('Could not complete freedman diaconis calculation', 'Calculating freedman diaconis was unsuccessful, \nIt seems that there are some NaN values, please remove them before graphing. \nOR \nInput bin size mangually.')
+
+            def change_bin_size():
+                try:
+                    bin_size = int(bin_size_get.get())
+                    
+                    fig, ax = plt.subplots()
+                    canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
+                    # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+                    canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
+
+                    ax.hist(df[column], bins=bin_size, rwidth=0.7)
+                    # Add labels and title
+                    plt.xlabel(column)
+                    plt.ylabel('Frequency')
+                    plt.title(f'{column} Histogram')
+                    
+                    canvas.draw()
+                except ValueError:
+                    messagebox.showerror('Input Valid Number', 'Please Input an integer & make sure it is not a float')
+
+            # Initialize Tkinter and Matplotlib Figure
+            graph_using_freedman_diaconis()
+
+            #extra features to edit graph
+            def graph_externally(column):
+                fig, ax = plt.subplots()
+                #calculate bins using 
+                Q75, Q25 = np.percentile(df[column], [75 ,25])
+                IQR = Q75 - Q25
+                bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                num_bins = int((max(df[column]) - min(df[column])) / bin_width)
+                ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                fig.show()
+            def display_count_graph(column):
+                #rebuild Canvas
+                fig, ax = plt.subplots()
+                canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
+                # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+                canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
+
+                #calculate bins using 
+                Q75, Q25 = np.percentile(df[column], [75 ,25])
+                IQR = Q75 - Q25
+                bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                num_bins = int((max(df[column]) - min(df[column])) / bin_width)
+                ax.hist(df[column], bins=num_bins, rwidth=0.7)
+
+                counts, edges, bars = ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                # counts, edges, bars = ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                ax.bar_label(bars)
+
+                # Add labels and title
+                plt.xlabel(column)
+                plt.ylabel('Frequency')
+                plt.title(f'{column} Histogram')
+                
+                canvas.draw()
+            def not_display_count_graph(column):
+                # Initialize Tkinter and Matplotlib Figure
+                fig, ax = plt.subplots()
+                canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
+                # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+                canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
+                # Plot data on Matplotlib Figure
+                #calculate bins using 
+                Q75, Q25 = np.percentile(df[column], [75 ,25])
+                IQR = Q75 - Q25
+                bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                num_bins = int((max(df[column]) - min(df[column])) / bin_width)
+                ax.hist(df[column], bins=num_bins, rwidth=0.7)
+
+                # Add labels and title
+                plt.xlabel(column)
+                plt.ylabel('Frequency')
+                plt.title(f'{column} Histogram')
+                
+                canvas.draw()
+    
+            Label(detailed_EDA_frame, text = "     ").grid(row=5, column=0)
+            Button(detailed_EDA_frame, text="Open Graph Externally", command=lambda: graph_externally(column)).grid(row=6, column=0)
+            Button(detailed_EDA_frame, text="Display Count Over Bar", command=lambda: display_count_graph(column)).grid(row=6, column=1)
+            Button(detailed_EDA_frame, text="Dont Display Count Over Bar", command=lambda: not_display_count_graph(column)).grid(row=6, column=2)
 
         #build statistics_detailed_EDA() automatically
         statistics_detailed_EDA(column)

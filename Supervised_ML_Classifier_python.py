@@ -185,13 +185,6 @@ def detailed_EDA():
     
     Label(detailed_EDA_window, text=" ").grid(row=2, column=0)
     def display_detailed_EDA(column):
-        #delete frame and rebuild it (incase user changes column)
-        # for widgets in detailed_EDA_window.winfo_children():
-        #     widgets.destroy()
-        for widgets in detailed_EDA_frame.winfo_children():
-            widgets.destroy()
-        detailed_EDA_frame.grid(row=3, column=0, columnspan=3)
-
         def nav_bar():
             Label(detailed_EDA_frame, bg="lightgray", text= column, padx=105).grid(row=0, column=0, columnspan=4)
             Button(detailed_EDA_frame, text="Statistics", command=lambda: statistics_detailed_EDA(column)).grid(row=1, column=0)
@@ -205,6 +198,8 @@ def detailed_EDA():
             detailed_EDA_frame.grid(row=3, column=0, columnspan=3)
             #put navbar again
             nav_bar()
+        
+        rebuild_everything_in_detailed_EDA_frame()
 
         def statistics_detailed_EDA(column):
             #deletes everything in frame
@@ -251,7 +246,7 @@ def detailed_EDA():
             rebuild_everything_in_detailed_EDA_frame()
 
             #change geometry
-            detailed_EDA_window.geometry("600x700")
+            detailed_EDA_window.geometry("700x660")
 
             Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
             # Initialize Tkinter and Matplotlib Figure
@@ -272,8 +267,6 @@ def detailed_EDA():
 
         #build statistics_detailed_EDA() automatically
         statistics_detailed_EDA(column)
-        #shows navbar
-        nav_bar()
 
 def EDA():
     EDA_frame.pack(side=TOP, anchor=NW)

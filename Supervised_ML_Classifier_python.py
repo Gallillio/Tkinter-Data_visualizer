@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Tkinter
 from tkinter import *
@@ -185,11 +186,33 @@ def detailed_EDA():
     Label(detailed_EDA_window, text=" ").grid(row=2, column=0)
     def display_detailed_EDA(column):
         #delete frame and rebuild it (incase user changes column)
+        # for widgets in detailed_EDA_window.winfo_children():
+        #     widgets.destroy()
         for widgets in detailed_EDA_frame.winfo_children():
             widgets.destroy()
         detailed_EDA_frame.grid(row=3, column=0, columnspan=3)
 
+        def nav_bar():
+            Label(detailed_EDA_frame, bg="lightgray", text= column, padx=105).grid(row=0, column=0, columnspan=4)
+            Button(detailed_EDA_frame, text="Statistics", command=lambda: statistics_detailed_EDA(column)).grid(row=1, column=0)
+            Button(detailed_EDA_frame, text="Histogram", command=lambda: histogram_detailed_EDA(column)).grid(row=1, column=1)
+            Button(detailed_EDA_frame, text="Common Values").grid(row=1, column=2)
+            Button(detailed_EDA_frame, text="Extreme Values").grid(row=1, column=3)
+        def rebuild_everything_in_detailed_EDA_frame():
+            #deletes everything in frame
+            for widgets in detailed_EDA_frame.winfo_children():
+                widgets.destroy()
+            detailed_EDA_frame.grid(row=3, column=0, columnspan=3)
+            #put navbar again
+            nav_bar()
+
         def statistics_detailed_EDA(column):
+            #deletes everything in frame
+            rebuild_everything_in_detailed_EDA_frame()
+
+            #change geometry
+            detailed_EDA_window.geometry("470x500")
+
             Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
             #min value
             Label(detailed_EDA_frame, text="Minimum: ").grid(row=3, column=0, columnspan=2)
@@ -223,18 +246,34 @@ def detailed_EDA():
             #standard diviation value
             Label(detailed_EDA_frame, text="STD: ").grid(row=7, column=2, columnspan=2)
             Label(detailed_EDA_frame, text= round(df[column].std(), 3)).grid(row=7, column=3, columnspan=2)
+        def histogram_detailed_EDA(column):
+            #deletes everything in frame
+            rebuild_everything_in_detailed_EDA_frame()
 
+            #change geometry
+            detailed_EDA_window.geometry("600x700")
 
+            Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
+            # Initialize Tkinter and Matplotlib Figure
+            fig, ax = plt.subplots()
+            canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
+            # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+            canvas.get_tk_widget().grid(row= 3, column= 0, columnspan= 5)
+            # Plot data on Matplotlib Figure
+            ax.hist(df[column], bins=50, rwidth=0.7)
+            # ax.hist(df[column], bins=num_bins, rwidth=0.7)
+
+            # Add labels and title
+            plt.xlabel(column)
+            plt.ylabel('Frequency')
+            plt.title(f'{column} Histogram')
+            
+            canvas.draw()
 
         #build statistics_detailed_EDA() automatically
         statistics_detailed_EDA(column)
-
-        Label(detailed_EDA_frame, bg="lightgray", text= column, padx=105).grid(row=0, column=0, columnspan=4)
-        Button(detailed_EDA_frame, text="Statistics", command=lambda: statistics_detailed_EDA(column)).grid(row=1, column=0)
-        Button(detailed_EDA_frame, text="Histogram").grid(row=1, column=1)
-        Button(detailed_EDA_frame, text="Common Values").grid(row=1, column=2)
-        Button(detailed_EDA_frame, text="Extreme Values").grid(row=1, column=3)
-
+        #shows navbar
+        nav_bar()
 
 def EDA():
     EDA_frame.pack(side=TOP, anchor=NW)

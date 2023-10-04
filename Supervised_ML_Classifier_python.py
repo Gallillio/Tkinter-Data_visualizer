@@ -225,6 +225,7 @@ def detailed_EDA():
             Label(detailed_EDA_frame, text= round(df[column].std(), 3)).grid(row=7, column=3, columnspan=2)
 
 
+
         #build statistics_detailed_EDA() automatically
         statistics_detailed_EDA(column)
 

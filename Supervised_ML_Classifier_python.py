@@ -471,6 +471,40 @@ def rename_column():
     Button(rename_column_window, text= "Rename Column", command= actually_rename_column).grid(row=2, column=0, columnspan=2)
     Button(rename_column_window, text= "Save & Close", command= save_and_close).grid(row=3, column=0, columnspan=2)
 
+def rename_column():
+    new_column_name_get = StringVar()
+    
+    #making window
+    rename_column_window = Toplevel(root, padx=30)
+    rename_column_window.title("Rename Column")
+    rename_column_window.geometry("430x500")
+
+    def actually_rename_column():
+        new_column_name = new_column_name_get.get()
+        column_to_rename = column_combobox_get.get()
+        global df
+        df.rename(columns = {f'{column_to_rename}':f'{new_column_name}'}, inplace = True)
+
+        removal_successful = messagebox.showinfo("Removed Duplicates Successful", "The duplicated data has been removed successfully")
+        if removal_successful == "ok":
+            # close_whatever_transform_window(remove_duplicates_window)
+            rename_column_window.destroy()
+            rename_column()
+    def save_and_close():
+        close_whatever_transform_window(rename_column_window)
+
+    choices = []
+    for i, column in enumerate(df.columns):
+        choices.append(column)
+    Label(rename_column_window, text= "Choose Column to Rename: ").grid(row=0, column=0)
+    Label(rename_column_window, text= "Rename Column to: ").grid(row=1, column=0)
+    column_combobox_get = ttk.Combobox(rename_column_window, values= choices)
+    column_combobox_get.grid(row=0, column=1)
+    Entry(rename_column_window, textvariable= new_column_name_get).grid(row=1, column=1)
+
+    Button(rename_column_window, text= "Rename Column", command= actually_rename_column).grid(row=2, column=0, columnspan=2)
+    Button(rename_column_window, text= "Save & Close", command= save_and_close).grid(row=3, column=0, columnspan=2)
+
 def remove_duplicates():
     #making window
     remove_duplicates_window = Toplevel(root, padx=30)
@@ -496,6 +530,7 @@ def remove_duplicates():
     Button(remove_duplicates_window, text= "Remove", command= lambda: actually_remove_duplicates()).grid(row=1, column=1)
     Label(remove_duplicates_window, text= "").grid(row=2, column=1)
     Button(remove_duplicates_window, text= "Create Index Column", command= lambda: create_index_column(remove_duplicates_window)).grid(row=3, column=1)
+    Button(remove_duplicates_window, text= "Rename Column", command= lambda: actually_remove_duplicates()).grid(row=1, column=1)
     Button(remove_duplicates_window, text= "Rename Column", command= lambda: actually_remove_duplicates()).grid(row=1, column=1)
 
 def create_index_column(remove_duplicates_window):
@@ -532,6 +567,7 @@ def transform_data():
     Button(transoform_data_frame, text="Handle NA", command=handle_NA).pack()
     Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
     Button(transoform_data_frame, text="Remove Column", command=remove_column).pack()
+    Button(transoform_data_frame, text="Rename Column", command=rename_column).pack()
     Button(transoform_data_frame, text="Rename Column", command=rename_column).pack()
     Button(transoform_data_frame, text="Remove Duplicates", command=remove_duplicates).pack()
     Button(transoform_data_frame, text="Create Index Column", command=lambda: create_index_column(None)).pack()

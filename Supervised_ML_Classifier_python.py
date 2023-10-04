@@ -59,7 +59,7 @@ def create_root(project_name):
     # width= root.winfo_screenwidth()               
     # height= root.winfo_screenheight()
     # root.geometry("%dx%d" % (width, height))
-    root.geometry("1100x600+300+100")
+    root.geometry("1100x680+300+100")
     # root.resizable(False,False)
 
 def root_loop() -> int:
@@ -188,7 +188,13 @@ def detailed_EDA():
         def nav_bar():
             Label(detailed_EDA_frame, bg="lightgray", text= column, padx=105).grid(row=0, column=0, columnspan=5)
             Button(detailed_EDA_frame, text="Statistics", command=lambda: statistics_detailed_EDA(column)).grid(row=1, column=0)
-            Button(detailed_EDA_frame, text="Histogram", command=lambda: histogram_detailed_EDA(column)).grid(row=1, column=1)
+            #show Histogram Button if column.dtype == float || int // show bar Button if column.dtype == Bool
+            # for i in df.columns:
+            #     print(i, df[i].dtype)
+            if df[column].dtype == np.dtype('bool') or (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())):
+                Button(detailed_EDA_frame, text="Stacked Bar", command=lambda: stacked_bar_detailed_EDA(column)).grid(row=1, column=1)
+            elif (df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32') and (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique()))):
+                Button(detailed_EDA_frame, text="Histogram", command=lambda: histogram_detailed_EDA(column)).grid(row=1, column=1)
             Button(detailed_EDA_frame, text="Common Values").grid(row=1, column=2)
             Button(detailed_EDA_frame, text="Extreme Values").grid(row=1, column=3)
         def rebuild_everything_in_detailed_EDA_frame():
@@ -287,7 +293,6 @@ def detailed_EDA():
                     
                     fig, ax = plt.subplots()
                     canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
-                    # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
                     canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
 
                     ax.hist(df[column], bins=bin_size, rwidth=0.7)
@@ -369,6 +374,57 @@ def detailed_EDA():
             Button(detailed_EDA_frame, text="Open Graph Externally", command=lambda: graph_externally(column)).grid(row=6, column=0)
             Button(detailed_EDA_frame, text="Display Count Over Bar", command=lambda: display_count_graph(column)).grid(row=6, column=1)
             Button(detailed_EDA_frame, text="Dont Display Count Over Bar", command=lambda: not_display_count_graph(column)).grid(row=6, column=2)
+        def stacked_bar_detailed_EDA(column):
+            #deletes everything in frame
+            rebuild_everything_in_detailed_EDA_frame()
+
+            #change geometry
+            detailed_EDA_window.geometry("700x705")
+
+            fig, ax = plt.subplots()
+            canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
+            canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
+            groups = ['%']
+            values1 = [len(df[df[column] == 0]) or len(df[df.Boolea == False])]
+            values2 = [len(df[df[column] == 1]) or len(df[df.Boolea == True])]
+            total = values1[0] + values2[0]
+
+            # Stacked bar chart
+            ax.bar(groups, values1, label = "0 or False")
+            ax.bar(groups, values2, bottom = values1, label = "1 or True")
+
+            for bar in ax.patches:
+                ax.text(bar.get_x() + bar.get_width() / 2,
+                    bar.get_height() / 2 + bar.get_y(),
+                    f"{round(bar.get_height())}({round((round(bar.get_height()) / total) * 100, 3)} %)", ha = 'center',
+                    color = 'w', weight = 'bold', size = 10)
+            
+            ax.legend()
+            canvas.draw()
+
+            #extra features to edit graph
+            def graph_externally(column):
+                fig, ax = plt.subplots()
+                groups = ['%']
+                values1 = [len(df[df[column] == 0]) or len(df[df.Boolea == False])]
+                values2 = [len(df[df[column] == 1]) or len(df[df.Boolea == True])]
+                total = values1[0] + values2[0]
+
+                # Stacked bar chart
+                ax.bar(groups, values1, label = "0 or False")
+                ax.bar(groups, values2, bottom = values1, label = "1 or True")
+
+                for bar in ax.patches:
+                    ax.text(bar.get_x() + bar.get_width() / 2,
+                        bar.get_height() / 2 + bar.get_y(),
+                        f"{round(bar.get_height())}({round((round(bar.get_height()) / total) * 100, 3)} %)", ha = 'center',
+                        color = 'w', weight = 'bold', size = 10)
+                
+                ax.legend()
+                fig.show()
+
+            Label(detailed_EDA_frame, text = "     ").grid(row=5, column=0)
+            Button(detailed_EDA_frame, text="Open Graph Externally", command=lambda: graph_externally(column)).grid(row=6, column=0)
 
         #build statistics_detailed_EDA() automatically
         statistics_detailed_EDA(column)

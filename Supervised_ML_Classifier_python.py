@@ -449,23 +449,31 @@ def handle_NA():
             global df
             mean = df[column_to_handle].mean()
             df[column_to_handle].fillna(value=mean, inplace=True)
-            messagebox.showinfo("Filling Successful", "NA cells have been filled with mean successfully in the column")
+            removal_successful = messagebox.showinfo("Filling Successful", "NA cells have been filled with mean successfully in the column")
+            if removal_successful == "ok":
+                close_whatever_transform_window(handle_NA_window)
         def replace_NA_with_median():
             column_to_handle = column_to_handle_na.get()
 
             global df
             median = df[column_to_handle].median()
             df[column_to_handle].fillna(value=median, inplace=True)
-            messagebox.showinfo("Filling Successful", "NA cells have been filled with median successfully in the column")
+            removal_successful = messagebox.showinfo("Filling Successful", "NA cells have been filled with median successfully in the column")
+            if removal_successful == "ok":
+                close_whatever_transform_window(handle_NA_window)
         def remove_NA_row():
             column_to_handle = column_to_handle_na.get()
 
             global df
             df.dropna(subset = [column_to_handle], inplace=True)
-            messagebox.showinfo("Removal Successful", "The rows has been removed successfully")
-
+            removal_successful = messagebox.showinfo("Removal Successful", "The rows has been removed successfully")
+            if removal_successful == "ok":
+                close_whatever_transform_window(handle_NA_window)
         def replace_all_NA_with_imputer(strategy):
             global df
+            imputer = SimpleImputer(strategy=strategy)
+            df_array_imputed = imputer.fit_transform(df)
+            df = pd.DataFrame(df_array_imputed, columns=df.columns)
             removal_successful = messagebox.showinfo("Filling Successful", f"NA cells have been filled with {strategy} successfully in all DataFrame")
             if removal_successful == "ok":
                     close_whatever_transform_window(handle_NA_window)
@@ -478,8 +486,8 @@ def handle_NA():
             if removal_successful == "ok":
                 close_whatever_transform_window(handle_NA_window)
 
-        Button(handle_NA_window, text= "Replace with Mean",command= lambda: replace_NA_with_mean()).grid(row=3, column=0, columnspan=2)
-        # Button(handle_NA_window, text= "Replace with Median",command= lambda: replace_NA_with_mean()).grid(row=3, column=1)
+        Button(handle_NA_window, text= "Replace with Mean",command= lambda: replace_NA_with_mean()).grid(row=3, column=0)
+        Button(handle_NA_window, text= "Replace with Median",command= lambda: replace_NA_with_median()).grid(row=3, column=1)
         Button(handle_NA_window, text= "Remove Entire Row",command= lambda: remove_NA_row()).grid(row=4, column=0, columnspan=2)
         Label(handle_NA_window, text= "or").grid(row=5, column=0, columnspan=2)
         Button(handle_NA_window, text= "Replace all NA with Mean",command= lambda: replace_all_NA_with_imputer("mean")).grid(row=6, column=0, columnspan=2)

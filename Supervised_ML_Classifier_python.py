@@ -303,16 +303,18 @@ def detailed_EDA():
                 canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
                 # Plot data on Matplotlib Figure
                 try:
-                    #calculate bins using 
-                    Q75, Q25 = np.percentile(df[column], [75 ,25])
-                    IQR = Q75 - Q25
-                    bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
-                    num_bins = int((max(df[column]) - min(df[column])) / bin_width)
                     #if dtype != Object
                     if column_dtype == np.dtype('O'):
                         top_10_words,word_counts = prepare_categorical_data_for_analysis()
-                        ax.hist(top_10_words, bins=num_bins, rwidth=0.7)
+                        top_10_words_numpy_array = np.array(top_10_words)
+                        bin_length = len(np.unique(top_10_words_numpy_array))
+                        ax.hist(top_10_words, bins=bin_length, rwidth=0.7)
                     else:
+                        #calculate bins using 
+                        Q75, Q25 = np.percentile(df[column], [75 ,25])
+                        IQR = Q75 - Q25
+                        bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                        num_bins = int((max(df[column]) - min(df[column])) / bin_width)
                         ax.hist(df[column], bins=num_bins, rwidth=0.7)
 
                     # Add labels and title
@@ -337,6 +339,7 @@ def detailed_EDA():
                     if column_dtype == np.dtype('O'):
                         top_10_words,word_counts = prepare_categorical_data_for_analysis()
                         ax.hist(top_10_words, bins=bin_size, rwidth=0.7)
+                        
                     else:
                         ax.hist(df[column], bins=bin_size, rwidth=0.7)
                     # Add labels and title
@@ -366,16 +369,18 @@ def detailed_EDA():
                     fig.show()
                 else:
                     fig, ax = plt.subplots()
-                    #calculate bins using 
-                    Q75, Q25 = np.percentile(df[column], [75 ,25])
-                    IQR = Q75 - Q25
-                    bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
-                    num_bins = int((max(df[column]) - min(df[column])) / bin_width)
                     #if dtype != Object
                     if column_dtype == np.dtype('O'):
                         top_10_words,word_counts = prepare_categorical_data_for_analysis()
-                        ax.hist(top_10_words, bins=num_bins, rwidth=0.7)
+                        top_10_words_numpy_array = np.array(top_10_words)
+                        bin_length = len(np.unique(top_10_words_numpy_array))
+                        ax.hist(top_10_words, bins=bin_length, rwidth=0.7)
                     else:
+                        #calculate bins using 
+                        Q75, Q25 = np.percentile(df[column], [75 ,25])
+                        IQR = Q75 - Q25
+                        bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                        num_bins = int((max(df[column]) - min(df[column])) / bin_width)
                         ax.hist(df[column], bins=num_bins, rwidth=0.7)
                     fig.show()
             def display_count_graph(column):
@@ -384,19 +389,23 @@ def detailed_EDA():
                 canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
                 canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
 
-                #calculate bins using 
-                Q75, Q25 = np.percentile(df[column], [75 ,25])
-                IQR = Q75 - Q25
-                bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
-                num_bins = int((max(df[column]) - min(df[column])) / bin_width)
                 #if dtype != Object
                 if column_dtype == np.dtype('O'):
                     #prepares words for analysis
                     top_10_words,word_counts = prepare_categorical_data_for_analysis()
-                    ax.hist(top_10_words, bins=num_bins, rwidth=0.7)
-                    counts, edges, bars = ax.hist(top_10_words, bins=num_bins, rwidth=0.7)
+                    
+                    top_10_words_numpy_array = np.array(top_10_words)
+                    bin_length = len(np.unique(top_10_words_numpy_array))
+
+                    ax.hist(top_10_words, bins=bin_length, rwidth=0.7)
+                    counts, edges, bars = ax.hist(top_10_words, bins=bin_length, rwidth=0.7)
                     ax.bar_label(bars)
                 else:
+                    #calculate bins using 
+                    Q75, Q25 = np.percentile(df[column], [75 ,25])
+                    IQR = Q75 - Q25
+                    bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                    num_bins = int((max(df[column]) - min(df[column])) / bin_width)
                     ax.hist(df[column], bins=num_bins, rwidth=0.7)
                     counts, edges, bars = ax.hist(df[column], bins=num_bins, rwidth=0.7)
                     ax.bar_label(bars)
@@ -414,16 +423,18 @@ def detailed_EDA():
                 # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
                 canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
                 # Plot data on Matplotlib Figure
-                #calculate bins using 
-                Q75, Q25 = np.percentile(df[column], [75 ,25])
-                IQR = Q75 - Q25
-                bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
-                num_bins = int((max(df[column]) - min(df[column])) / bin_width)
                 #if dtype != Object
                 if column_dtype == np.dtype('O'):
                     top_10_words,word_counts = prepare_categorical_data_for_analysis()
-                    ax.hist(top_10_words, bins=num_bins, rwidth=0.7)
+                    top_10_words_numpy_array = np.array(top_10_words)
+                    bin_length = len(np.unique(top_10_words_numpy_array))
+                    ax.hist(top_10_words, bins=bin_length, rwidth=0.7)
                 else:
+                    #calculate bins using 
+                    Q75, Q25 = np.percentile(df[column], [75 ,25])
+                    IQR = Q75 - Q25
+                    bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                    num_bins = int((max(df[column]) - min(df[column])) / bin_width)
                     ax.hist(df[column], bins=num_bins, rwidth=0.7)
 
                 # Add labels and title

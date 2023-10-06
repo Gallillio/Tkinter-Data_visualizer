@@ -193,8 +193,8 @@ def detailed_EDA():
             #show Histogram Button if column.dtype == float || int // show bar Button if column.dtype == Bool
             if df[column].dtype == np.dtype('bool') or (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())):
                 Button(detailed_EDA_frame, text="Stacked Bar", command=lambda: stacked_bar_detailed_EDA(column)).grid(row=1, column=1)
-            elif (df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32') and (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique()))):
-                Button(detailed_EDA_frame, text="Histogram", command=lambda: histogram_detailed_EDA(column)).grid(row=1, column=1)
+            elif (df[column].dtype == np.dtype('O') or df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32') and (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique()))):
+                Button(detailed_EDA_frame, text="Histogram", command=lambda: histogram_detailed_EDA(column, df[column].dtype)).grid(row=1, column=1)
             Button(detailed_EDA_frame, text="Common Values").grid(row=1, column=2)
             Button(detailed_EDA_frame, text="Extreme Values").grid(row=1, column=3)
         def rebuild_everything_in_detailed_EDA_frame():
@@ -205,8 +205,20 @@ def detailed_EDA():
             #put navbar again
             nav_bar()     
         rebuild_everything_in_detailed_EDA_frame()
-
+        
+        def prepare_categorical_data_for_analysis():
+                all_sentences = ' '.join(df[column])
+                cleaned_text = re.sub(r'[^\w\s]', '', all_sentences)
+                words = cleaned_text.lower().split()
+                word_counts = Counter(words)
+                top_10_words_with_count = word_counts.most_common(10)
+                top_10_words = []
+                for word in top_10_words_with_count:
+                    for i in range(word[1]):
+                        top_10_words.append(word[0])
+                return top_10_words, word_counts
         def statistics_detailed_EDA(column):
+            
             #if column.dtype == int or bool
             if df[column].dtype == np.dtype('bool') or df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32'):
                 #deletes everything in frame
@@ -249,12 +261,7 @@ def detailed_EDA():
                 Label(detailed_EDA_frame, text= round(df[column].std(), 3)).grid(row=7, column=3, columnspan=2)
             #if column.dtype == category
             elif df[column].dtype == np.dtype('O'):
-                #prepares words for analysis
-                all_sentences = ' '.join(df[column])
-                cleaned_text = re.sub(r'[^\w\s]', '', all_sentences)
-                words = cleaned_text.lower().split()
-                word_counts = Counter(words)
-                word_counts.most_common()
+                top_10_words,word_counts = prepare_categorical_data_for_analysis()
 
                 #deletes everything in frame
                 rebuild_everything_in_detailed_EDA_frame()
@@ -270,11 +277,9 @@ def detailed_EDA():
                 Label(detailed_EDA_frame, text="Most Used Word: ").grid(row=4, column=0, columnspan=2)
                 Label(detailed_EDA_frame, text= f"{word_counts.most_common()[0][0]}").grid(row=4, column=1, columnspan=2)
                 Label(detailed_EDA_frame, text=f"Count: {word_counts.most_common()[0][1]}").grid(row=4, column=2, columnspan=2)
-
-
             else:
                 print("HOWWWWWWWWWWW")
-        def histogram_detailed_EDA(column):
+        def histogram_detailed_EDA(column, column_dtype):
             #deletes everything in frame
             rebuild_everything_in_detailed_EDA_frame()
 
@@ -288,8 +293,6 @@ def detailed_EDA():
             Entry(detailed_EDA_frame, textvariable= bin_size_get).grid(row=3, column=1)
             Button(detailed_EDA_frame, text="Confirm", command=lambda: change_bin_size()).grid(row=3, column=2)
             Button(detailed_EDA_frame, text="Or use freedman diaconis", command=lambda: graph_using_freedman_diaconis()).grid(row=3, column=3)
-
-            print(df[column].dtype)
 
             def graph_using_freedman_diaconis():
                 global bin_size
@@ -305,7 +308,12 @@ def detailed_EDA():
                     IQR = Q75 - Q25
                     bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
                     num_bins = int((max(df[column]) - min(df[column])) / bin_width)
-                    ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                    #if dtype != Object
+                    if column_dtype == np.dtype('O'):
+                        top_10_words,word_counts = prepare_categorical_data_for_analysis()
+                        ax.hist(top_10_words, bins=num_bins, rwidth=0.7)
+                    else:
+                        ax.hist(df[column], bins=num_bins, rwidth=0.7)
 
                     # Add labels and title
                     plt.xlabel(column)
@@ -325,7 +333,12 @@ def detailed_EDA():
                     canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
                     canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
 
-                    ax.hist(df[column], bins=bin_size, rwidth=0.7)
+                    #if dtype != Object
+                    if column_dtype == np.dtype('O'):
+                        top_10_words,word_counts = prepare_categorical_data_for_analysis()
+                        ax.hist(top_10_words, bins=bin_size, rwidth=0.7)
+                    else:
+                        ax.hist(df[column], bins=bin_size, rwidth=0.7)
                     # Add labels and title
                     plt.xlabel(column)
                     plt.ylabel('Frequency')
@@ -344,7 +357,12 @@ def detailed_EDA():
                 global bin_size
                 if bin_size != True:
                     fig, ax = plt.subplots()
-                    ax.hist(df[column], bins=bin_size, rwidth=0.7)
+                    #if dtype != Object
+                    if column_dtype == np.dtype('O'):
+                        top_10_words,word_counts = prepare_categorical_data_for_analysis()
+                        ax.hist(top_10_words, bins=bin_size, rwidth=0.7)
+                    else:
+                        ax.hist(df[column], bins=bin_size, rwidth=0.7)
                     fig.show()
                 else:
                     fig, ax = plt.subplots()
@@ -353,13 +371,17 @@ def detailed_EDA():
                     IQR = Q75 - Q25
                     bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
                     num_bins = int((max(df[column]) - min(df[column])) / bin_width)
-                    ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                    #if dtype != Object
+                    if column_dtype == np.dtype('O'):
+                        top_10_words,word_counts = prepare_categorical_data_for_analysis()
+                        ax.hist(top_10_words, bins=num_bins, rwidth=0.7)
+                    else:
+                        ax.hist(df[column], bins=num_bins, rwidth=0.7)
                     fig.show()
             def display_count_graph(column):
                 #rebuild Canvas
                 fig, ax = plt.subplots()
                 canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
-                # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
                 canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
 
                 #calculate bins using 
@@ -367,11 +389,17 @@ def detailed_EDA():
                 IQR = Q75 - Q25
                 bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
                 num_bins = int((max(df[column]) - min(df[column])) / bin_width)
-                ax.hist(df[column], bins=num_bins, rwidth=0.7)
-
-                counts, edges, bars = ax.hist(df[column], bins=num_bins, rwidth=0.7)
-                # counts, edges, bars = ax.hist(df[column], bins=num_bins, rwidth=0.7)
-                ax.bar_label(bars)
+                #if dtype != Object
+                if column_dtype == np.dtype('O'):
+                    #prepares words for analysis
+                    top_10_words,word_counts = prepare_categorical_data_for_analysis()
+                    ax.hist(top_10_words, bins=num_bins, rwidth=0.7)
+                    counts, edges, bars = ax.hist(top_10_words, bins=num_bins, rwidth=0.7)
+                    ax.bar_label(bars)
+                else:
+                    ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                    counts, edges, bars = ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                    ax.bar_label(bars)
 
                 # Add labels and title
                 plt.xlabel(column)
@@ -391,7 +419,12 @@ def detailed_EDA():
                 IQR = Q75 - Q25
                 bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
                 num_bins = int((max(df[column]) - min(df[column])) / bin_width)
-                ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                #if dtype != Object
+                if column_dtype == np.dtype('O'):
+                    top_10_words,word_counts = prepare_categorical_data_for_analysis()
+                    ax.hist(top_10_words, bins=num_bins, rwidth=0.7)
+                else:
+                    ax.hist(df[column], bins=num_bins, rwidth=0.7)
 
                 # Add labels and title
                 plt.xlabel(column)
@@ -399,7 +432,7 @@ def detailed_EDA():
                 plt.title(f'{column} Histogram')
                 
                 canvas.draw()
-    
+
             Label(detailed_EDA_frame, text = "     ").grid(row=5, column=0)
             Button(detailed_EDA_frame, text="Open Graph Externally", command=lambda: graph_externally(column)).grid(row=6, column=0)
             Button(detailed_EDA_frame, text="Display Count Over Bar", command=lambda: display_count_graph(column)).grid(row=6, column=1)

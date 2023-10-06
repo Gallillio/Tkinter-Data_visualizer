@@ -195,9 +195,9 @@ def detailed_EDA():
                 Button(detailed_EDA_frame, text="Stacked Bar", command=lambda: stacked_bar_detailed_EDA(column)).grid(row=1, column=1)
             elif (df[column].dtype == np.dtype('O') or df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32') and (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique()))):
                 Button(detailed_EDA_frame, text="Histogram", command=lambda: histogram_detailed_EDA(column, df[column].dtype)).grid(row=1, column=1)
-            # if not (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())) or not df[column].dtype != np.dtype('bool'):
+            #only show Common Value button if its a float or int
             if (df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32')) and not (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())):
-                Button(detailed_EDA_frame, text="Common Values").grid(row=1, column=2)
+                Button(detailed_EDA_frame, text="Common Values", command=lambda: common_values_detailed_EDA(column)).grid(row=1, column=2)
             Button(detailed_EDA_frame, text="Extreme Values").grid(row=1, column=3)
         def rebuild_everything_in_detailed_EDA_frame():
             #deletes everything in frame
@@ -514,7 +514,40 @@ def detailed_EDA():
             Label(detailed_EDA_frame, text = "     ").grid(row=5, column=0)
             Button(detailed_EDA_frame, text="Open Graph Externally", command=lambda: graph_externally(column)).grid(row=6, column=0, columnspan=5)
         def common_values_detailed_EDA(column):
-            ...
+             #deletes everything in frame
+            rebuild_everything_in_detailed_EDA_frame()
+            #change geometry
+            detailed_EDA_window.geometry("700x705")
+            
+            #calculate top 10
+            column_name = df[column].value_counts().nlargest(10).index
+            column_count = df[column].value_counts().nlargest(10).values
+
+            #rebuild Canvas
+            def display_graph():
+                fig, ax = plt.subplots()
+                canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
+                canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
+
+                # Horizontal Bar Plot
+                ax.barh(column_name, column_count)
+
+                # Add padding between axes and labels
+                ax.xaxis.set_tick_params(pad = 5)
+                ax.yaxis.set_tick_params(pad = 10)
+
+                # Add annotation to bars
+                for i in ax.patches:
+                    plt.text(i.get_width()+0.2, i.get_y()+0.5, str(round((i.get_width()), 2)), fontsize = 10, fontweight ='bold', color ='grey')
+                
+                # Add labels and title
+                plt.xlabel("Count")
+                plt.ylabel("Cell Value")
+                plt.title(f"{column} Top Values")
+
+            display_graph()
+
+            
 
         #build statistics_detailed_EDA() automatically
         statistics_detailed_EDA(column)

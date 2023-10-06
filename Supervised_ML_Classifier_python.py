@@ -403,14 +403,21 @@ def detailed_EDA():
                     counts, edges, bars = ax.hist(top_10_words, bins=bin_length)
                     ax.bar_label(bars)
                 else:
-                    #calculate bins using 
-                    Q75, Q25 = np.percentile(df[column], [75 ,25])
-                    IQR = Q75 - Q25
-                    bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
-                    num_bins = int((max(df[column]) - min(df[column])) / bin_width)
-                    ax.hist(df[column], bins=num_bins, rwidth=0.7)
-                    counts, edges, bars = ax.hist(df[column], bins=num_bins, rwidth=0.7)
-                    ax.bar_label(bars)
+                    #if bin_size isnt custom made
+                    global bin_size
+                    if bin_size != True:
+                        ax.hist(df[column], bins=bin_size, rwidth=0.7)
+                        counts, edges, bars = ax.hist(df[column], bins=bin_size, rwidth=0.7)
+                        ax.bar_label(bars)
+                    else:
+                        #calculate bins using 
+                        Q75, Q25 = np.percentile(df[column], [75 ,25])
+                        IQR = Q75 - Q25
+                        bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                        num_bins = int((max(df[column]) - min(df[column])) / bin_width)
+                        ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                        counts, edges, bars = ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                        ax.bar_label(bars)
 
                 # Add labels and title
                 plt.xlabel(column)
@@ -432,12 +439,16 @@ def detailed_EDA():
                     bin_length = len(np.unique(top_10_words_numpy_array))
                     ax.hist(top_10_words, bins=bin_length)
                 else:
-                    #calculate bins using 
-                    Q75, Q25 = np.percentile(df[column], [75 ,25])
-                    IQR = Q75 - Q25
-                    bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
-                    num_bins = int((max(df[column]) - min(df[column])) / bin_width)
-                    ax.hist(df[column], bins=num_bins, rwidth=0.7)
+                    global bin_size
+                    if bin_size != True:
+                        ax.hist(df[column], bins=bin_size, rwidth=0.7)
+                    else:
+                        #calculate bins using 
+                        Q75, Q25 = np.percentile(df[column], [75 ,25])
+                        IQR = Q75 - Q25
+                        bin_width = 2 * IQR * np.power(len(df[column]), -1/3)
+                        num_bins = int((max(df[column]) - min(df[column])) / bin_width)
+                        ax.hist(df[column], bins=num_bins, rwidth=0.7)
 
                 # Add labels and title
                 plt.xlabel(column)

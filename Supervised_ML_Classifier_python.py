@@ -308,7 +308,7 @@ def detailed_EDA():
                         top_10_words,word_counts = prepare_categorical_data_for_analysis()
                         top_10_words_numpy_array = np.array(top_10_words)
                         bin_length = len(np.unique(top_10_words_numpy_array))
-                        ax.hist(top_10_words, bins=bin_length, rwidth=0.7)
+                        ax.hist(top_10_words, bins=bin_length)
                     else:
                         #calculate bins using 
                         Q75, Q25 = np.percentile(df[column], [75 ,25])
@@ -374,7 +374,7 @@ def detailed_EDA():
                         top_10_words,word_counts = prepare_categorical_data_for_analysis()
                         top_10_words_numpy_array = np.array(top_10_words)
                         bin_length = len(np.unique(top_10_words_numpy_array))
-                        ax.hist(top_10_words, bins=bin_length, rwidth=0.7)
+                        ax.hist(top_10_words, bins=bin_length)
                     else:
                         #calculate bins using 
                         Q75, Q25 = np.percentile(df[column], [75 ,25])
@@ -397,8 +397,8 @@ def detailed_EDA():
                     top_10_words_numpy_array = np.array(top_10_words)
                     bin_length = len(np.unique(top_10_words_numpy_array))
 
-                    ax.hist(top_10_words, bins=bin_length, rwidth=0.7)
-                    counts, edges, bars = ax.hist(top_10_words, bins=bin_length, rwidth=0.7)
+                    ax.hist(top_10_words, bins=bin_length)
+                    counts, edges, bars = ax.hist(top_10_words, bins=bin_length)
                     ax.bar_label(bars)
                 else:
                     #calculate bins using 
@@ -428,7 +428,7 @@ def detailed_EDA():
                     top_10_words,word_counts = prepare_categorical_data_for_analysis()
                     top_10_words_numpy_array = np.array(top_10_words)
                     bin_length = len(np.unique(top_10_words_numpy_array))
-                    ax.hist(top_10_words, bins=bin_length, rwidth=0.7)
+                    ax.hist(top_10_words, bins=bin_length)
                 else:
                     #calculate bins using 
                     Q75, Q25 = np.percentile(df[column], [75 ,25])

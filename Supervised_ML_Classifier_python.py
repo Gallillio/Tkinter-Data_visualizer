@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from collections import Counter
+import re
 
 # Tkinter
 from tkinter import *
@@ -189,8 +191,6 @@ def detailed_EDA():
             Label(detailed_EDA_frame, bg="lightgray", text= column, padx=105).grid(row=0, column=0, columnspan=5)
             Button(detailed_EDA_frame, text="Statistics", command=lambda: statistics_detailed_EDA(column)).grid(row=1, column=0)
             #show Histogram Button if column.dtype == float || int // show bar Button if column.dtype == Bool
-            # for i in df.columns:
-            #     print(i, df[i].dtype)
             if df[column].dtype == np.dtype('bool') or (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())):
                 Button(detailed_EDA_frame, text="Stacked Bar", command=lambda: stacked_bar_detailed_EDA(column)).grid(row=1, column=1)
             elif (df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32') and (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique()))):
@@ -203,50 +203,77 @@ def detailed_EDA():
                 widgets.destroy()
             detailed_EDA_frame.grid(row=3, column=0, columnspan=3)
             #put navbar again
-            nav_bar()
-        
+            nav_bar()     
         rebuild_everything_in_detailed_EDA_frame()
 
         def statistics_detailed_EDA(column):
-            #deletes everything in frame
-            rebuild_everything_in_detailed_EDA_frame()
+            #if column.dtype == int or bool
+            if df[column].dtype == np.dtype('bool') or df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32'):
+                #deletes everything in frame
+                rebuild_everything_in_detailed_EDA_frame()
+                #change geometry
+                detailed_EDA_window.geometry("470x500")
 
-            #change geometry
-            detailed_EDA_window.geometry("470x500")
+                Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
+                #min value
+                Label(detailed_EDA_frame, text="Minimum: ").grid(row=3, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= min(df[column])).grid(row=3, column=1, columnspan=2)
+                #max value
+                Label(detailed_EDA_frame, text="Maximum: ").grid(row=4, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= max(df[column])).grid(row=4, column=1, columnspan=2)
+                #distance value
+                Label(detailed_EDA_frame, text="Distinct: ").grid(row=3, column=2, columnspan=2)
+                Label(detailed_EDA_frame, text= len(pd.unique(df[column]))).grid(row=3, column=3, columnspan=2)
+                #distance percentage
+                Label(detailed_EDA_frame, text="Distinct (%): ").grid(row=4, column=2, columnspan=2)
+                distinct_percentage = round((len(pd.unique(df[column])) / len(df[column])) * 100, 1)
+                Label(detailed_EDA_frame, text= f"{distinct_percentage}%").grid(row=4, column=3, columnspan=2)
+                #mean value
+                Label(detailed_EDA_frame, text="Mean: ").grid(row=5, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= round(df[column].mean(), 3)).grid(row=5, column=1, columnspan=2)
+                #median value
+                Label(detailed_EDA_frame, text="Median: ").grid(row=6, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= round(df[column].median(), 3)).grid(row=6, column=1, columnspan=2)
+                #missing value
+                Label(detailed_EDA_frame, text="Missing: ").grid(row=5, column=2, columnspan=2)
+                Label(detailed_EDA_frame, text= df[column].isna().sum()).grid(row=5, column=3, columnspan=2)
+                #missing percentage
+                Label(detailed_EDA_frame, text="Missing(%): ").grid(row=6, column=2, columnspan=2)
+                missing_percentage = round((df[column].isna().sum() / len(df[column])) * 100, 1)
+                Label(detailed_EDA_frame, text= f"{missing_percentage}%").grid(row=6, column=3, columnspan=2)
+                #sum value
+                Label(detailed_EDA_frame, text="Sum: ").grid(row=7, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= round(df[column].sum(), 3)).grid(row=7, column=1, columnspan=2)
+                #standard diviation value
+                Label(detailed_EDA_frame, text="STD: ").grid(row=7, column=2, columnspan=2)
+                Label(detailed_EDA_frame, text= round(df[column].std(), 3)).grid(row=7, column=3, columnspan=2)
+            #if column.dtype == category
+            elif df[column].dtype == np.dtype('O'):
+                #prepares words for analysis
+                all_sentences = ' '.join(df[column])
+                cleaned_text = re.sub(r'[^\w\s]', '', all_sentences)
+                words = cleaned_text.lower().split()
+                word_counts = Counter(words)
+                word_counts.most_common()
 
-            Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
-            #min value
-            Label(detailed_EDA_frame, text="Minimum: ").grid(row=3, column=0, columnspan=2)
-            Label(detailed_EDA_frame, text= min(df[column])).grid(row=3, column=1, columnspan=2)
-            #max value
-            Label(detailed_EDA_frame, text="Maximum: ").grid(row=4, column=0, columnspan=2)
-            Label(detailed_EDA_frame, text= max(df[column])).grid(row=4, column=1, columnspan=2)
-            #distance value
-            Label(detailed_EDA_frame, text="Distinct: ").grid(row=3, column=2, columnspan=2)
-            Label(detailed_EDA_frame, text= len(pd.unique(df[column]))).grid(row=3, column=3, columnspan=2)
-            #distance percentage
-            Label(detailed_EDA_frame, text="Distinct (%): ").grid(row=4, column=2, columnspan=2)
-            distinct_percentage = round((len(pd.unique(df[column])) / len(df[column])) * 100, 1)
-            Label(detailed_EDA_frame, text= f"{distinct_percentage}%").grid(row=4, column=3, columnspan=2)
-            #mean value
-            Label(detailed_EDA_frame, text="Mean: ").grid(row=5, column=0, columnspan=2)
-            Label(detailed_EDA_frame, text= round(df[column].mean(), 3)).grid(row=5, column=1, columnspan=2)
-            #median value
-            Label(detailed_EDA_frame, text="Median: ").grid(row=6, column=0, columnspan=2)
-            Label(detailed_EDA_frame, text= round(df[column].median(), 3)).grid(row=6, column=1, columnspan=2)
-            #missing value
-            Label(detailed_EDA_frame, text="Missing: ").grid(row=5, column=2, columnspan=2)
-            Label(detailed_EDA_frame, text= df[column].isna().sum()).grid(row=5, column=3, columnspan=2)
-            #missing percentage
-            Label(detailed_EDA_frame, text="Missing(%): ").grid(row=6, column=2, columnspan=2)
-            missing_percentage = round((df[column].isna().sum() / len(df[column])) * 100, 1)
-            Label(detailed_EDA_frame, text= f"{missing_percentage}%").grid(row=6, column=3, columnspan=2)
-            #sum value
-            Label(detailed_EDA_frame, text="Sum: ").grid(row=7, column=0, columnspan=2)
-            Label(detailed_EDA_frame, text= round(df[column].sum(), 3)).grid(row=7, column=1, columnspan=2)
-            #standard diviation value
-            Label(detailed_EDA_frame, text="STD: ").grid(row=7, column=2, columnspan=2)
-            Label(detailed_EDA_frame, text= round(df[column].std(), 3)).grid(row=7, column=3, columnspan=2)
+                #deletes everything in frame
+                rebuild_everything_in_detailed_EDA_frame()
+                #change geometry
+                detailed_EDA_window.geometry("470x500")
+
+                Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
+                #Least Used word
+                Label(detailed_EDA_frame, text="Least Used Word: ").grid(row=3, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= f"{word_counts.most_common()[-1][0]}").grid(row=3, column=1, columnspan=2)
+                Label(detailed_EDA_frame, text=f"Count: {word_counts.most_common()[-1][1]}").grid(row=3, column=2, columnspan=2)
+                #Most Used word
+                Label(detailed_EDA_frame, text="Most Used Word: ").grid(row=4, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= f"{word_counts.most_common()[0][0]}").grid(row=4, column=1, columnspan=2)
+                Label(detailed_EDA_frame, text=f"Count: {word_counts.most_common()[0][1]}").grid(row=4, column=2, columnspan=2)
+
+
+            else:
+                print("HOWWWWWWWWWWW")
         def histogram_detailed_EDA(column):
             #deletes everything in frame
             rebuild_everything_in_detailed_EDA_frame()
@@ -261,6 +288,9 @@ def detailed_EDA():
             Entry(detailed_EDA_frame, textvariable= bin_size_get).grid(row=3, column=1)
             Button(detailed_EDA_frame, text="Confirm", command=lambda: change_bin_size()).grid(row=3, column=2)
             Button(detailed_EDA_frame, text="Or use freedman diaconis", command=lambda: graph_using_freedman_diaconis()).grid(row=3, column=3)
+
+            print(df[column].dtype)
+
             def graph_using_freedman_diaconis():
                 global bin_size
                 bin_size = True
@@ -424,7 +454,7 @@ def detailed_EDA():
                 fig.show()
 
             Label(detailed_EDA_frame, text = "     ").grid(row=5, column=0)
-            Button(detailed_EDA_frame, text="Open Graph Externally", command=lambda: graph_externally(column)).grid(row=6, column=0)
+            Button(detailed_EDA_frame, text="Open Graph Externally", command=lambda: graph_externally(column)).grid(row=6, column=0, columnspan=5)
 
         #build statistics_detailed_EDA() automatically
         statistics_detailed_EDA(column)

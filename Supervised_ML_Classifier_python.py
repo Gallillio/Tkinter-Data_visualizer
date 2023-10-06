@@ -195,7 +195,9 @@ def detailed_EDA():
                 Button(detailed_EDA_frame, text="Stacked Bar", command=lambda: stacked_bar_detailed_EDA(column)).grid(row=1, column=1)
             elif (df[column].dtype == np.dtype('O') or df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32') and (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique()))):
                 Button(detailed_EDA_frame, text="Histogram", command=lambda: histogram_detailed_EDA(column, df[column].dtype)).grid(row=1, column=1)
-            Button(detailed_EDA_frame, text="Common Values").grid(row=1, column=2)
+            # if not (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())) or not df[column].dtype != np.dtype('bool'):
+            if (df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32')) and not (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())):
+                Button(detailed_EDA_frame, text="Common Values").grid(row=1, column=2)
             Button(detailed_EDA_frame, text="Extreme Values").grid(row=1, column=3)
         def rebuild_everything_in_detailed_EDA_frame():
             #deletes everything in frame
@@ -219,8 +221,7 @@ def detailed_EDA():
                         top_10_words.append(word[0])
 
                 return top_10_words, word_counts
-        def statistics_detailed_EDA(column):
-            
+        def statistics_detailed_EDA(column):      
             #if column.dtype == int or bool
             if df[column].dtype == np.dtype('bool') or df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32'):
                 #deletes everything in frame
@@ -512,6 +513,8 @@ def detailed_EDA():
 
             Label(detailed_EDA_frame, text = "     ").grid(row=5, column=0)
             Button(detailed_EDA_frame, text="Open Graph Externally", command=lambda: graph_externally(column)).grid(row=6, column=0, columnspan=5)
+        def common_values_detailed_EDA(column):
+            ...
 
         #build statistics_detailed_EDA() automatically
         statistics_detailed_EDA(column)

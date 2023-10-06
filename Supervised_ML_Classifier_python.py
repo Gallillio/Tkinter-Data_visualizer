@@ -213,9 +213,11 @@ def detailed_EDA():
                 word_counts = Counter(words)
                 top_10_words_with_count = word_counts.most_common(10)
                 top_10_words = []
+                #get top 10 words
                 for word in top_10_words_with_count:
                     for i in range(word[1]):
                         top_10_words.append(word[0])
+
                 return top_10_words, word_counts
         def statistics_detailed_EDA(column):
             

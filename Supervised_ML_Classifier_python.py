@@ -306,7 +306,6 @@ def detailed_EDA():
                 Label(detailed_EDA_frame, text="Missing(%): ").grid(row=4, column=0, columnspan=2)
                 missing_percentage = round((df[column].isna().sum() / len(df[column])) * 100, 1)
                 Label(detailed_EDA_frame, text= f"{missing_percentage}%").grid(row=4, column=1, columnspan=5)
-
         def histogram_detailed_EDA(column, column_dtype):
             #deletes everything in frame
             rebuild_everything_in_detailed_EDA_frame()
@@ -573,22 +572,22 @@ def detailed_EDA():
             #change new threshold
             threshold_get = StringVar()
             Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
-            Label(detailed_EDA_frame, text="Enter New Threshold").grid(row=3, column=0)
-            Entry(detailed_EDA_frame, textvariable= threshold_get).grid(row=3, column=1)
-            Button(detailed_EDA_frame, text="Confirm", command=lambda: change_threshold()).grid(row=3, column=2)
 
             #calculations
-            Q1 = df[column].quantile(0.25)
-            Q3 = df[column].quantile(0.75)
-            IQR = Q3 - Q1
+            def IQR_calculations(threshold = 1.5):
+                Q1 = df[column].quantile(0.25)
+                Q3 = df[column].quantile(0.75)
+                IQR = Q3 - Q1
 
-            threshold = 1.5 #this is default, it can be changed
-            lower_bound = Q1 - threshold * IQR
-            upper_bound = Q3 + threshold * IQR
-            outliers = df[column][(df[column] < lower_bound) | (df[column] > upper_bound)]
+                lower_bound = Q1 - threshold * IQR
+                upper_bound = Q3 + threshold * IQR
+                outliers = df[column][(df[column] < lower_bound) | (df[column] > upper_bound)]
 
-            outliers_name = outliers.value_counts().index
-            outliers_count = outliers.value_counts().values
+                outliers_name = outliers.value_counts().index
+                outliers_count = outliers.value_counts().values
+
+                return outliers_name, outliers_count
+            outliers_name, outliers_count = IQR_calculations() #default threshold
 
             def display_graph():
                 for i in range(len(outliers_name)):
@@ -603,9 +602,6 @@ def detailed_EDA():
                     for i in ax.patches:
                         plt.text(i.get_width()+0.2, i.get_y()+0.5, str(round((i.get_width()), 2)), fontsize = 10, fontweight ='bold', color ='grey')
             display_graph()
-
-            def change_threshold():
-                ...
 
         
             

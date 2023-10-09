@@ -198,7 +198,7 @@ def detailed_EDA():
             #only show Common Value button if its a float or int
             if (df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32')) and not (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())):
                 Button(detailed_EDA_frame, text="Common Values", command=lambda: common_values_detailed_EDA(column)).grid(row=1, column=2)
-            Button(detailed_EDA_frame, text="Extreme Values").grid(row=1, column=3)
+            Button(detailed_EDA_frame, text="Extreme Values", command=lambda: extreme_values_detailed_EDA(column)).grid(row=1, column=3)
         def rebuild_everything_in_detailed_EDA_frame():
             #deletes everything in frame
             for widgets in detailed_EDA_frame.winfo_children():
@@ -221,21 +221,40 @@ def detailed_EDA():
                         top_10_words.append(word[0])
 
                 return top_10_words, word_counts
-        def statistics_detailed_EDA(column):      
-            #if column.dtype == int or bool
-            if df[column].dtype == np.dtype('bool') or df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32'):
-                #deletes everything in frame
-                rebuild_everything_in_detailed_EDA_frame()
-                #change geometry
-                detailed_EDA_window.geometry("470x500")
+        def statistics_detailed_EDA(column):
+            #deletes everything in frame
+            rebuild_everything_in_detailed_EDA_frame()
+            #change geometry
+            detailed_EDA_window.geometry("470x500")
 
-                Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
-                #min value
+            Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)  
+            #if column.dtype == int or bool
+            if (df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32')) and not (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())):
+                #min
                 Label(detailed_EDA_frame, text="Minimum: ").grid(row=3, column=0, columnspan=2)
                 Label(detailed_EDA_frame, text= min(df[column])).grid(row=3, column=1, columnspan=2)
-                #max value
-                Label(detailed_EDA_frame, text="Maximum: ").grid(row=4, column=0, columnspan=2)
-                Label(detailed_EDA_frame, text= max(df[column])).grid(row=4, column=1, columnspan=2)
+                #Q1
+                Q1 = df[column].quantile(0.25)
+                Label(detailed_EDA_frame, text="Q1: ").grid(row=4, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= Q1).grid(row=4, column=1, columnspan=2)
+                #median value
+                Label(detailed_EDA_frame, text="Median: ").grid(row=5, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= round(df[column].median(), 3)).grid(row=5, column=1, columnspan=2)
+                #Q3
+                Q3 = df[column].quantile(0.75)
+                Label(detailed_EDA_frame, text="Q3: ").grid(row=6, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= Q1).grid(row=6, column=1, columnspan=2)
+                #max
+                Label(detailed_EDA_frame, text="Maximum: ").grid(row=8, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= max(df[column])).grid(row=8, column=1, columnspan=2)
+                #IQR
+                column_iqr = Q3 - Q1
+                Label(detailed_EDA_frame, text="IQR: ").grid(row=7, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= column_iqr).grid(row=7, column=1, columnspan=2)
+                #mean 
+                Label(detailed_EDA_frame, text="Mean: ").grid(row=9, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= round(df[column].mean(), 3)).grid(row=9, column=1, columnspan=2)
+
                 #distance value
                 Label(detailed_EDA_frame, text="Distinct: ").grid(row=3, column=2, columnspan=2)
                 Label(detailed_EDA_frame, text= len(pd.unique(df[column]))).grid(row=3, column=3, columnspan=2)
@@ -243,12 +262,6 @@ def detailed_EDA():
                 Label(detailed_EDA_frame, text="Distinct (%): ").grid(row=4, column=2, columnspan=2)
                 distinct_percentage = round((len(pd.unique(df[column])) / len(df[column])) * 100, 1)
                 Label(detailed_EDA_frame, text= f"{distinct_percentage}%").grid(row=4, column=3, columnspan=2)
-                #mean value
-                Label(detailed_EDA_frame, text="Mean: ").grid(row=5, column=0, columnspan=2)
-                Label(detailed_EDA_frame, text= round(df[column].mean(), 3)).grid(row=5, column=1, columnspan=2)
-                #median value
-                Label(detailed_EDA_frame, text="Median: ").grid(row=6, column=0, columnspan=2)
-                Label(detailed_EDA_frame, text= round(df[column].median(), 3)).grid(row=6, column=1, columnspan=2)
                 #missing value
                 Label(detailed_EDA_frame, text="Missing: ").grid(row=5, column=2, columnspan=2)
                 Label(detailed_EDA_frame, text= df[column].isna().sum()).grid(row=5, column=3, columnspan=2)
@@ -256,22 +269,20 @@ def detailed_EDA():
                 Label(detailed_EDA_frame, text="Missing(%): ").grid(row=6, column=2, columnspan=2)
                 missing_percentage = round((df[column].isna().sum() / len(df[column])) * 100, 1)
                 Label(detailed_EDA_frame, text= f"{missing_percentage}%").grid(row=6, column=3, columnspan=2)
-                #sum value
-                Label(detailed_EDA_frame, text="Sum: ").grid(row=7, column=0, columnspan=2)
-                Label(detailed_EDA_frame, text= round(df[column].sum(), 3)).grid(row=7, column=1, columnspan=2)
-                #standard diviation value
+                #standard diviation
                 Label(detailed_EDA_frame, text="STD: ").grid(row=7, column=2, columnspan=2)
                 Label(detailed_EDA_frame, text= round(df[column].std(), 3)).grid(row=7, column=3, columnspan=2)
+                #Range
+                range = df[column].max() - df[column].min()
+                Label(detailed_EDA_frame, text="Range: ").grid(row=8, column=2, columnspan=2)
+                Label(detailed_EDA_frame, text= range).grid(row=8, column=3, columnspan=2)
+                #sum 
+                Label(detailed_EDA_frame, text="Sum: ").grid(row=9, column=2, columnspan=2)
+                Label(detailed_EDA_frame, text= round(df[column].sum(), 3)).grid(row=9, column=3, columnspan=2)
             #if column.dtype == category
             elif df[column].dtype == np.dtype('O'):
                 top_10_words,word_counts = prepare_categorical_data_for_analysis()
 
-                #deletes everything in frame
-                rebuild_everything_in_detailed_EDA_frame()
-                #change geometry
-                detailed_EDA_window.geometry("470x500")
-
-                Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
                 #Least Used word
                 Label(detailed_EDA_frame, text="Least Used Word: ").grid(row=3, column=0, columnspan=2)
                 Label(detailed_EDA_frame, text= f"{word_counts.most_common()[-1][0]}").grid(row=3, column=1, columnspan=2)
@@ -280,8 +291,22 @@ def detailed_EDA():
                 Label(detailed_EDA_frame, text="Most Used Word: ").grid(row=4, column=0, columnspan=2)
                 Label(detailed_EDA_frame, text= f"{word_counts.most_common()[0][0]}").grid(row=4, column=1, columnspan=2)
                 Label(detailed_EDA_frame, text=f"Count: {word_counts.most_common()[0][1]}").grid(row=4, column=2, columnspan=2)
+            #if bool
             else:
-                print("HOWWWWWWWWWWW")
+                #deletes everything in frame
+                rebuild_everything_in_detailed_EDA_frame()
+                #change geometry
+                detailed_EDA_window.geometry("470x500")
+                Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
+
+                #missing value
+                Label(detailed_EDA_frame, text="Missing: ").grid(row=3, column=0, columnspan=2)
+                Label(detailed_EDA_frame, text= df[column].isna().sum()).grid(row=3, column=1, columnspan=5)
+                #missing percentage
+                Label(detailed_EDA_frame, text="Missing(%): ").grid(row=4, column=0, columnspan=2)
+                missing_percentage = round((df[column].isna().sum() / len(df[column])) * 100, 1)
+                Label(detailed_EDA_frame, text= f"{missing_percentage}%").grid(row=4, column=1, columnspan=5)
+
         def histogram_detailed_EDA(column, column_dtype):
             #deletes everything in frame
             rebuild_everything_in_detailed_EDA_frame()
@@ -525,28 +550,64 @@ def detailed_EDA():
 
             #rebuild Canvas
             def display_graph():
-                fig, ax = plt.subplots()
-                canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
-                canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
-
-                # Horizontal Bar Plot
-                ax.barh(column_name, column_count)
-
-                # Add padding between axes and labels
-                ax.xaxis.set_tick_params(pad = 5)
-                ax.yaxis.set_tick_params(pad = 10)
-
-                # Add annotation to bars
-                for i in ax.patches:
-                    plt.text(i.get_width()+0.2, i.get_y()+0.5, str(round((i.get_width()), 2)), fontsize = 10, fontweight ='bold', color ='grey')
-                
-                # Add labels and title
-                plt.xlabel("Count")
-                plt.ylabel("Cell Value")
-                plt.title(f"{column} Top Values")
+                for i in range(len(column_name)):
+                    fig, ax = plt.subplots(figsize=(6, 0.4))
+                    canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
+                    canvas.get_tk_widget().grid(row= 4+i, column= 0, columnspan= 5)
+                    ax.barh(column_name[i], column_count[i])
+                    
+                    plt.yticks([column_name[i]])
+                    plt.xticks([min(column_count), max(column_count)])
+                    
+                    for i in ax.patches:
+                        plt.text(i.get_width()+0.2, i.get_y()+0.5, str(round((i.get_width()), 2)), fontsize = 10, fontweight ='bold', color ='grey')
 
             display_graph()
+        def extreme_values_detailed_EDA(column):
+            #deletes everything in frame
+            rebuild_everything_in_detailed_EDA_frame()
 
+            #change geometry
+            detailed_EDA_window.geometry("700x705")
+
+            #change new threshold
+            threshold_get = StringVar()
+            Label(detailed_EDA_frame, text = "     ").grid(row=2, column=0)
+            Label(detailed_EDA_frame, text="Enter New Threshold").grid(row=3, column=0)
+            Entry(detailed_EDA_frame, textvariable= threshold_get).grid(row=3, column=1)
+            Button(detailed_EDA_frame, text="Confirm", command=lambda: change_threshold()).grid(row=3, column=2)
+
+            #calculations
+            Q1 = df[column].quantile(0.25)
+            Q3 = df[column].quantile(0.75)
+            IQR = Q3 - Q1
+
+            threshold = 1.5 #this is default, it can be changed
+            lower_bound = Q1 - threshold * IQR
+            upper_bound = Q3 + threshold * IQR
+            outliers = df[column][(df[column] < lower_bound) | (df[column] > upper_bound)]
+
+            outliers_name = outliers.value_counts().index
+            outliers_count = outliers.value_counts().values
+
+            def display_graph():
+                for i in range(len(outliers_name)):
+                    fig, ax = plt.subplots(figsize=(6, 0.4))
+                    canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
+                    canvas.get_tk_widget().grid(row= 4+i, column= 0, columnspan= 5)
+                    ax.barh(outliers_name[i], outliers_count[i])
+                    
+                    plt.yticks([outliers_name[i]])
+                    plt.xticks([min(outliers_count), max(outliers_count)])
+                    
+                    for i in ax.patches:
+                        plt.text(i.get_width()+0.2, i.get_y()+0.5, str(round((i.get_width()), 2)), fontsize = 10, fontweight ='bold', color ='grey')
+            display_graph()
+
+            def change_threshold():
+                ...
+
+        
             
 
         #build statistics_detailed_EDA() automatically

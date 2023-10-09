@@ -169,7 +169,7 @@ def treeview_of_df():
 
 def detailed_EDA():    
     detailed_EDA_window = Toplevel(root, padx=30)
-    detailed_EDA_window.title("Handle NA")
+    detailed_EDA_window.title("Detailed EDA")
     detailed_EDA_window.geometry("470x500")
 
     detailed_EDA_frame = LabelFrame(detailed_EDA_window) #will be used in display_detailed_EDA()
@@ -378,7 +378,6 @@ def detailed_EDA():
                 except ValueError:
                     messagebox.showerror('Input Valid Number', 'Please Input an integer & make sure it is not a float')
 
-            # Initialize Tkinter and Matplotlib Figure
             graph_using_freedman_diaconis()
 
             #extra features to edit graph
@@ -601,13 +600,48 @@ def detailed_EDA():
                     
                     for i in ax.patches:
                         plt.text(i.get_width()+0.2, i.get_y()+0.5, str(round((i.get_width()), 2)), fontsize = 10, fontweight ='bold', color ='grey')
-            display_graph()
-
-        
-            
+            display_graph()                  
 
         #build statistics_detailed_EDA() automatically
         statistics_detailed_EDA(column)
+
+def interaction_graph():
+    interaction_window = Toplevel(root, padx=30)
+    interaction_window.title("Interaction")
+    interaction_window.geometry("700x705")
+
+    interaction_frame = LabelFrame(interaction_window) #will be used in display_interaction()
+    Label(interaction_window, bg="gray", padx = 105, text = "Interaction Between Column").grid(row=0, column=0, columnspan=5)
+
+    choices = []
+    for i, column in enumerate(df.columns):
+        if (df[column].dtype == np.dtype('O')) or (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())) or (df[column].dtype == np.dtype('bool')):
+            continue
+        else:
+            choices.append(column)
+
+    Label(interaction_window, text = "Choose x and y columns to view interaction").grid(row=1, column=0, columnspan=5)
+    Label(interaction_window, text = "x").grid(row=2, column=0)
+    x_column_combobox_get = ttk.Combobox(interaction_window, values= choices)
+    x_column_combobox_get.grid(row=2, column=1)
+
+    Label(interaction_window, text = "y").grid(row=2, column=2)
+    y_column_combobox_get = ttk.Combobox(interaction_window, values= choices)
+    y_column_combobox_get.grid(row=2, column=3)
+    Button(interaction_window, text= "Display Chosen Columns", command= lambda: display_interaction(x_column_combobox_get.get(), y_column_combobox_get.get())).grid(row=3, column=0, columnspan=5)
+
+
+    def display_interaction(x_column, y_column):
+        def rebuild_everything_in_display_interaction_frame():
+            #deletes everything in frame
+            for widgets in interaction_frame.winfo_children():
+                widgets.destroy()
+            interaction_frame.grid(row=3, column=0, columnspan=3)
+        rebuild_everything_in_display_interaction_frame()
+
+
+
+
 
 def EDA():
     EDA_frame.pack(side=TOP, anchor=NW)
@@ -631,11 +665,13 @@ def EDA():
     Label(EDA_frame, text = f"Number of Features: {len(df.columns)}").grid(row=0, column=0)
     Label(EDA_frame, text = f"Number of Rows: {len(df)}").grid(row=1, column=0)
     Label(EDA_frame, text = f"Number of Missing Cells: {df.isnull().sum().sum()}").grid(row=2, column=0)
-    Button(EDA_frame, text="More Detailed EDA", command=detailed_EDA).grid(row=3, column=0, columnspan=3)
     empty_space_label.grid(row=0, column=1)
     Label(EDA_frame, text = f"Number of Numaric Columns: {len(column_is_numaric)}").grid(row=0, column=2)
     Label(EDA_frame, text = f"Number of Boolean Columns: {len(column_is_bool)}").grid(row=1, column=2)
     Label(EDA_frame, text = f"Number of Categorical Columns: {len(column_is_categorical)}").grid(row=2, column=2)
+
+    Button(EDA_frame, text="More Detailed EDA", command=detailed_EDA).grid(row=3, column=0, columnspan=2)
+    Button(EDA_frame, text="Interactions", command=interaction_graph).grid(row=3, column=1, columnspan=2)
 
 def close_whatever_transform_window(transform_window):
     transform_window.destroy()

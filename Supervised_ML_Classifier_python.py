@@ -326,11 +326,10 @@ def detailed_EDA():
                 bin_size = True
                 fig, ax = plt.subplots()
                 canvas = FigureCanvasTkAgg(fig, master=detailed_EDA_frame)  
-                # canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
                 canvas.get_tk_widget().grid(row= 4, column= 0, columnspan= 5)
                 # Plot data on Matplotlib Figure
                 try:
-                    #if dtype != Object
+                    #if dtype == Object
                     if column_dtype == np.dtype('O'):
                         top_10_words,word_counts = prepare_categorical_data_for_analysis()
                         top_10_words_numpy_array = np.array(top_10_words)
@@ -623,12 +622,14 @@ def interaction_graph():
     Label(interaction_window, text = "Choose x and y columns to view interaction").grid(row=1, column=0, columnspan=5)
     Label(interaction_window, text = "x").grid(row=2, column=0)
     x_column_combobox_get = ttk.Combobox(interaction_window, values= choices)
-    x_column_combobox_get.grid(row=2, column=1)
+    x_column_combobox_get.grid(row=3, column=0)
 
     Label(interaction_window, text = "y").grid(row=2, column=2)
     y_column_combobox_get = ttk.Combobox(interaction_window, values= choices)
-    y_column_combobox_get.grid(row=2, column=3)
-    Button(interaction_window, text= "Display Chosen Columns", command= lambda: display_interaction(x_column_combobox_get.get(), y_column_combobox_get.get())).grid(row=3, column=0, columnspan=5)
+    y_column_combobox_get.grid(row=3, column=2)
+    Button(interaction_window, text= "Display Chosen Columns", command= lambda: display_interaction(x_column_combobox_get.get(), y_column_combobox_get.get())).grid(row=4, column=0, columnspan=5)
+    empty_space_label = Label(interaction_window, text = "     ")
+    empty_space_label.grid(row=5, column=0)
 
 
     def display_interaction(x_column, y_column):
@@ -636,8 +637,21 @@ def interaction_graph():
             #deletes everything in frame
             for widgets in interaction_frame.winfo_children():
                 widgets.destroy()
-            interaction_frame.grid(row=3, column=0, columnspan=3)
+            interaction_frame.grid(row=6, column=0, columnspan=3)
         rebuild_everything_in_display_interaction_frame()
+
+        fig, ax = plt.subplots()
+        canvas = FigureCanvasTkAgg(fig, master=interaction_frame)  
+        canvas.get_tk_widget().grid(row= 0, column= 0, columnspan= 5)
+
+        # ax.hist(df[column], bins=num_bins, rwidth=0.7)
+
+        # Add labels and title
+        plt.xlabel(x_column)
+        plt.ylabel(y_column)
+        plt.title(f'{x_column} - {y_column} Scatter Plot Interaction')
+        
+        canvas.draw()
 
 
 

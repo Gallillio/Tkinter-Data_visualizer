@@ -1031,65 +1031,6 @@ def transform_data():
     Button(transoform_data_frame, text="Remove Duplicates", command=remove_duplicates).pack()
     Button(transoform_data_frame, text="Create Index Column", command=lambda: create_index_column(None)).pack()
 
-def standard_scaler():
-    scaler = StandardScaler()
-    x_train_scaled = scaler.fit_transform(x_train)
-    x_test_scaled = scaler.transform(x_test) #using same mean used in scaling x_train
-
-def split_data():
-    split_data_frame.pack(side=TOP, anchor=NW)
-    target_column_get = StringVar()
-    train_size_get = StringVar()
-
-    def select_target():
-        target_column = target_column_get.get()
-
-        # y: target_column, x: all dependant columns
-        global x, y
-        x = df.drop([target_column], axis=1)
-        y = df[target_column]
-        submission_successful = messagebox.showinfo("Data Selection Successful", "Target and Independant Variables have been selected successfully")
-        if submission_successful == "ok":
-            #reset split_data_frame
-            # for widgets in split_data_frame.winfo_children():
-            #     widgets.destroy()
-            # split_data()
-
-            #show current Target Value
-            Label(split_data_frame, text= "Selected Target Column: ").grid(row=3, column=0)
-            selected_target_column = Label(split_data_frame, text= target_column)
-            selected_target_column.grid(row=3, column=1)
-            
-            #add x_train, x_test, y_train, y_test Labels
-            def actually_split_data():
-                train_size = float(train_size_get.get())
-                #checks if train_size is between 0 -1, if not send an error
-                if 0 <= train_size <= 1:
-                    global x_train, x_test, y_train, y_test
-                    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=train_size)
-                    submission_successful = messagebox.showinfo("Data Split Sucecessfully", "(x_train, x_test, y_train, y_test) have been created created successfully")
-                    if submission_successful == "ok":
-                        Label(transoform_data_frame).pack()
-                        Label(transoform_data_frame, bg="gray", text="Feature Transformation Methods").pack()
-                        Button(transoform_data_frame, text="Standard Scaler", command=standard_scaler).pack()
-                else:
-                    pass
-            
-            Label(split_data_frame, text= "\n").grid(row=4, column=0)
-            Label(split_data_frame, bg="gray", text= "Splitting Data").grid(row=5, column=0, columnspan=2)
-            Label(split_data_frame, text= "train size(0-1): ").grid(row=6, column=0)
-            Entry(split_data_frame, textvariable= train_size_get).grid(row=6, column=1)
-            Button(split_data_frame, text= "Confirm train size & Split Data",command= lambda: actually_split_data()).grid(row=7, column=0, columnspan=2)           
-
-    Label(split_data_frame, bg="gray", text= "Target & Independant Selection").grid(row=0, column=0, columnspan=2)
-    Label(split_data_frame, text= "Input Target Column: ").grid(row=1, column=0)
-    Entry(split_data_frame, textvariable= target_column_get).grid(row=1, column=1)
-    Button(split_data_frame, text= "Confirm Target Selection",command= lambda: select_target()).grid(row=2, column=0, columnspan=2)
-
-
-
-
-
 def main() -> int:
     """
     Main Function for processing the data
@@ -1111,3 +1052,65 @@ def main() -> int:
 if (__name__ == "__main__"):
     
     main()
+
+#########################################################################################################
+
+"""
+This section of the code is suppose to be for the future planned continuation of the project
+Where I can Split thje data and scale it and do some basic machine learning models
+"""
+
+# def standard_scaler():
+#     scaler = StandardScaler()
+#     x_train_scaled = scaler.fit_transform(x_train)
+#     x_test_scaled = scaler.transform(x_test) #using same mean used in scaling x_train
+
+# def split_data():
+#     split_data_frame.pack(side=TOP, anchor=NW)
+#     target_column_get = StringVar()
+#     train_size_get = StringVar()
+
+#     def select_target():
+#         target_column = target_column_get.get()
+
+#         # y: target_column, x: all dependant columns
+#         global x, y
+#         x = df.drop([target_column], axis=1)
+#         y = df[target_column]
+#         submission_successful = messagebox.showinfo("Data Selection Successful", "Target and Independant Variables have been selected successfully")
+#         if submission_successful == "ok":
+#             #reset split_data_frame
+#             # for widgets in split_data_frame.winfo_children():
+#             #     widgets.destroy()
+#             # split_data()
+
+#             #show current Target Value
+#             Label(split_data_frame, text= "Selected Target Column: ").grid(row=3, column=0)
+#             selected_target_column = Label(split_data_frame, text= target_column)
+#             selected_target_column.grid(row=3, column=1)
+            
+#             #add x_train, x_test, y_train, y_test Labels
+#             def actually_split_data():
+#                 train_size = float(train_size_get.get())
+#                 #checks if train_size is between 0 -1, if not send an error
+#                 if 0 <= train_size <= 1:
+#                     global x_train, x_test, y_train, y_test
+#                     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=train_size)
+#                     submission_successful = messagebox.showinfo("Data Split Sucecessfully", "(x_train, x_test, y_train, y_test) have been created created successfully")
+#                     if submission_successful == "ok":
+#                         Label(transoform_data_frame).pack()
+#                         Label(transoform_data_frame, bg="gray", text="Feature Transformation Methods").pack()
+#                         Button(transoform_data_frame, text="Standard Scaler", command=standard_scaler).pack()
+#                 else:
+#                     pass
+            
+#             Label(split_data_frame, text= "\n").grid(row=4, column=0)
+#             Label(split_data_frame, bg="gray", text= "Splitting Data").grid(row=5, column=0, columnspan=2)
+#             Label(split_data_frame, text= "train size(0-1): ").grid(row=6, column=0)
+#             Entry(split_data_frame, textvariable= train_size_get).grid(row=6, column=1)
+#             Button(split_data_frame, text= "Confirm train size & Split Data",command= lambda: actually_split_data()).grid(row=7, column=0, columnspan=2)           
+
+#     Label(split_data_frame, bg="gray", text= "Target & Independant Selection").grid(row=0, column=0, columnspan=2)
+#     Label(split_data_frame, text= "Input Target Column: ").grid(row=1, column=0)
+#     Entry(split_data_frame, textvariable= target_column_get).grid(row=1, column=1)
+#     Button(split_data_frame, text= "Confirm Target Selection",command= lambda: select_target()).grid(row=2, column=0, columnspan=2)

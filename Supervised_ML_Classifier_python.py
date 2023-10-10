@@ -1040,7 +1040,7 @@ def split_data():
     split_data_frame.pack(side=TOP, anchor=NW)
     target_column_get = StringVar()
     train_size_get = StringVar()
-    
+
     def select_target():
         target_column = target_column_get.get()
 
@@ -1057,7 +1057,8 @@ def split_data():
 
             #show current Target Value
             Label(split_data_frame, text= "Selected Target Column: ").grid(row=3, column=0)
-            Label(split_data_frame, text= target_column).grid(row=3, column=1)
+            selected_target_column = Label(split_data_frame, text= target_column)
+            selected_target_column.grid(row=3, column=1)
             
             #add x_train, x_test, y_train, y_test Labels
             def actually_split_data():

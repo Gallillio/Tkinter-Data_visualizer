@@ -716,10 +716,15 @@ def close_whatever_transform_window(transform_window):
     #delete old treeview and repack it
     for widgets in treevew_data_frame.winfo_children():
         widgets.destroy()
-    #deletes old 
+    #deletes old NA treeview
     for widgets in treevew_has_NA_data_frame.winfo_children():
         widgets.destroy()
     treeview_of_df()
+
+    #deltes and repacks EDA EDA_frame
+    for widgets in EDA_frame.winfo_children():
+        widgets.destroy()
+    EDA()
 
 def handle_NA():
     #check if any columns have NA
@@ -1049,6 +1054,7 @@ def split_data():
             # for widgets in split_data_frame.winfo_children():
             #     widgets.destroy()
             # split_data()
+
             #show current Target Value
             Label(split_data_frame, text= "Selected Target Column: ").grid(row=3, column=0)
             Label(split_data_frame, text= target_column).grid(row=3, column=1)

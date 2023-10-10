@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from collections import Counter
 import re
@@ -644,7 +645,7 @@ def interaction_graph():
         canvas = FigureCanvasTkAgg(fig, master=interaction_frame)  
         canvas.get_tk_widget().grid(row= 0, column= 0, columnspan= 5)
 
-        # ax.hist(df[column], bins=num_bins, rwidth=0.7)
+        ax.scatter(df[x_column], df[y_column])
 
         # Add labels and title
         plt.xlabel(x_column)
@@ -653,9 +654,30 @@ def interaction_graph():
         
         canvas.draw()
 
+def correlation():
+    correlation_window = Toplevel(root, padx=30)
+    correlation_window.title("Correlation")
+    correlation_window.geometry("690x605")
 
+    correlation_frame = LabelFrame(correlation_window) #will be used in display_correlation()
+    Label(correlation_window, bg="gray", padx = 105, text = "Correlation Between Columns").grid(row=0, column=0, columnspan=5)
 
+    def display_correlation():
+        def rebuild_everything_in_correlation_frame():
+            #deletes everything in frame
+            for widgets in correlation_frame.winfo_children():
+                widgets.destroy()
+            correlation_frame.grid(row=1, column=0)
+        rebuild_everything_in_correlation_frame()
 
+        fig, ax = plt.subplots()
+        canvas = FigureCanvasTkAgg(fig, master=correlation_frame)  
+        canvas.get_tk_widget().grid(row= 0, column= 0)
+
+        sns.heatmap(df.corr(), cmap='YlGnBu')
+        
+        canvas.draw()
+    display_correlation()
 
 def EDA():
     EDA_frame.pack(side=TOP, anchor=NW)
@@ -680,12 +702,13 @@ def EDA():
     Label(EDA_frame, text = f"Number of Rows: {len(df)}").grid(row=1, column=0)
     Label(EDA_frame, text = f"Number of Missing Cells: {df.isnull().sum().sum()}").grid(row=2, column=0)
     empty_space_label.grid(row=0, column=1)
-    Label(EDA_frame, text = f"Number of Numaric Columns: {len(column_is_numaric)}").grid(row=0, column=2)
-    Label(EDA_frame, text = f"Number of Boolean Columns: {len(column_is_bool)}").grid(row=1, column=2)
-    Label(EDA_frame, text = f"Number of Categorical Columns: {len(column_is_categorical)}").grid(row=2, column=2)
+    Label(EDA_frame, text = f"Number of Numaric Columns: {len(column_is_numaric)}").grid(row=0, column=1)
+    Label(EDA_frame, text = f"Number of Boolean Columns: {len(column_is_bool)}").grid(row=1, column=1)
+    Label(EDA_frame, text = f"Number of Categorical Columns: {len(column_is_categorical)}").grid(row=2, column=1)
 
-    Button(EDA_frame, text="More Detailed EDA", command=detailed_EDA).grid(row=3, column=0, columnspan=2)
-    Button(EDA_frame, text="Interactions", command=interaction_graph).grid(row=3, column=1, columnspan=2)
+    Button(EDA_frame, text="More Detailed EDA", command=detailed_EDA).grid(row=0, column=2)
+    Button(EDA_frame, text="Interactions", command=interaction_graph).grid(row=1, column=2)
+    Button(EDA_frame, text="Correlations", command=correlation).grid(row=2, column=2)
 
 def close_whatever_transform_window(transform_window):
     transform_window.destroy()

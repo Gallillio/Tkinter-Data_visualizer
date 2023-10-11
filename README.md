@@ -34,7 +34,8 @@ You can also check detailed EDA on columns, this includes:
      
      ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/535a4d5b-8684-4f3b-b02b-a5f6163d77a4)
   
-  3) Histogram for numaric data with custom bin number or using freeman diaconis
+  2) Histogram for numaric data with custom bin number or using freeman diaconis
+
     ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/0d6dc9a4-a636-46c9-8a2e-89f5c7bf691e)
 
   4) Stacked Bar for boolean data with percentage of each bool from total values

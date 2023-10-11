@@ -10,21 +10,21 @@ Simple Data Visualizer Using Tkinter Python.
 
 <h3> ✨Milestones: </h3>
   1) Implement basic features that includes: EDA / Transforming Data / Seeing Interaction and Correlation between columns ✅ <br>
-  2) Implement <li>1. Data Manipulation feature: Filtering / Sorting / Joins & Merging ❌ <br>
-               <li>2. Feature Engineering & Data Reduction <br>
-  3) Implement 1. Machine Learning featuers: splitting data & train - test model ❌ <br>
-               2. Normalization / Standardization <br>
+  2) Implement <li> 1. Data Manipulation feature: Filtering / Sorting / Joins & Merging ❌ <br>
+               <li> 2. Feature Engineering & Data Reduction <br>
+  3) Implement <li> 1. Machine Learning featuers: splitting data & train - test model ❌ <br>
+               <li> 2. Normalization / Standardization <br>
   4) (Maybe) Use a web Framework instead of Tkinter ❌ <br>
 
 <h3> What it currently is: </h3>
-Use Tkinter GUI to import CSV file and do certain operations on it such as:
-  1) Check of NaN values and handle them
-  2) Encode Columns
-  3) Remove Duplicates
-  4) See Interaction between 2 columns
-  5) See Correlation Heatmap
-  6) Rename columns
-  7) Remove Columns
+Use Tkinter GUI to import CSV file and do certain operations on it such as: <br>
+  1) Check of NaN values and handle them <br>
+  2) Encode Columns <br>
+  3) Remove Duplicates <br>
+  4) See Interaction between 2 columns <br>
+  5) See Correlation Heatmap <br>
+  6) Rename columns <br>
+  7) Remove Columns <br>
   
 ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/ee180592-855f-42f4-bec1-e8c8616d335a)
 

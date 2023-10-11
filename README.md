@@ -31,6 +31,7 @@ Use Tkinter GUI to import CSV file and do certain operations on it such as: <br>
 
 You can also check detailed EDA on columns, this includes:
   1) Statistical Information such as: Minimum / Maximum / IQR / Mean / Median / Distinct Data & its percentage / Missing Data & its percentage / STD / Sum
+     
      ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/535a4d5b-8684-4f3b-b02b-a5f6163d77a4)
   
   3) Histogram for numaric data with custom bin number or using freeman diaconis

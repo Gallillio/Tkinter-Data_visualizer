@@ -1027,7 +1027,6 @@ def transform_data():
     Button(transoform_data_frame, text="Encode Column", command=encode_columns).pack()
     Button(transoform_data_frame, text="Remove Column", command=remove_column).pack()
     Button(transoform_data_frame, text="Rename Column", command=rename_column).pack()
-    Button(transoform_data_frame, text="Rename Column", command=rename_column).pack()
     Button(transoform_data_frame, text="Remove Duplicates", command=remove_duplicates).pack()
     Button(transoform_data_frame, text="Create Index Column", command=lambda: create_index_column(None)).pack()
 

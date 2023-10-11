@@ -199,7 +199,7 @@ def detailed_EDA():
             #only show Common Value button if its a float or int
             if (df[column].dtype == np.dtype('float64') or df[column].dtype == np.dtype('int64') or df[column].dtype == np.dtype('float32') or df[column].dtype == np.dtype('int32')) and not (len(df[column].unique()) == 2 and (1 in df[column].unique() and 0 in df[column].unique())):
                 Button(detailed_EDA_frame, text="Common Values", command=lambda: common_values_detailed_EDA(column)).grid(row=1, column=2)
-            Button(detailed_EDA_frame, text="Extreme Values", command=lambda: extreme_values_detailed_EDA(column)).grid(row=1, column=3)
+                Button(detailed_EDA_frame, text="Extreme Values", command=lambda: extreme_values_detailed_EDA(column)).grid(row=1, column=3)
         def rebuild_everything_in_detailed_EDA_frame():
             #deletes everything in frame
             for widgets in detailed_EDA_frame.winfo_children():

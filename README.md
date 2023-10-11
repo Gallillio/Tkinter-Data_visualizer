@@ -10,8 +10,8 @@ Simple Data Visualizer Using Tkinter Python.
 
 <h3> ✨Milestones: </h3>
   1) Implement basic features that includes: EDA / Transforming Data / Seeing Interaction and Correlation between columns ✅ <br>
-  2) Implement 1. Data Manipulation feature: Filtering / Sorting / Joins & Merging ❌ <br>
-<pre>               </pre>2. Feature Engineering & Data Reduction <br>
+  2) Implement <li>1. Data Manipulation feature: Filtering / Sorting / Joins & Merging ❌ <br>
+               <li>2. Feature Engineering & Data Reduction <br>
   3) Implement 1. Machine Learning featuers: splitting data & train - test model ❌ <br>
                2. Normalization / Standardization <br>
   4) (Maybe) Use a web Framework instead of Tkinter ❌ <br>

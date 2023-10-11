@@ -27,7 +27,6 @@ Use Tkinter GUI to import CSV file and do certain operations on it such as: <br>
   7) Remove Columns <br>
   
 ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/ee180592-855f-42f4-bec1-e8c8616d335a)
-![dark](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/bbf690e1-6dee-4090-b68e-a7d679d34db9)
 
 
 You can also check detailed EDA on columns, this includes:

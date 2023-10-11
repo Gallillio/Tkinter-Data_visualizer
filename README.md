@@ -26,26 +26,29 @@ Use Tkinter GUI to import CSV file and do certain operations on it such as: <br>
   6) Rename columns <br>
   7) Remove Columns <br>
   
-![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/ee180592-855f-42f4-bec1-e8c8616d335a)
+![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/91bec91f-cafe-49e7-b86b-bca3e8e81a86)
 
 
 You can also check detailed EDA on columns, this includes:
   1) Statistical Information such as: Minimum / Maximum / IQR / Mean / Median / Distinct Data & its percentage / Missing Data & its percentage / STD / Sum
      
-     ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/535a4d5b-8684-4f3b-b02b-a5f6163d77a4)
+     ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/519120a1-8b8d-40ae-8dd9-6ac8b3434cc1)
+
   
-  2) Histogram for numaric data with custom bin number or using freeman diaconis
+  3) Histogram for numaric data with custom bin number or using freeman diaconis
 
      ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/0d6dc9a4-a636-46c9-8a2e-89f5c7bf691e)
 
-  3) Stacked Bar for boolean data with percentage of each bool from total values
+  4) Stacked Bar for boolean data with percentage of each bool from total values
      
-     ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/239ab2d6-ab9c-4e90-8b24-9415d061812b)
+     ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/95b0ce9f-7e5a-42aa-8d68-10c84f0666e6)
   
-  4) Most Common Values
+  6) Most Common Values
      
-     ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/725871f6-af42-4bb1-8def-32e1822661fc)
+     ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/c763c65b-4e53-440e-a55f-01713fe6bf6b)
 
-  5) Extreme Values (Outliers)
+
+  8) Extreme Values (Outliers)
      
-     ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/828f6bfb-7253-44e4-876e-1d23dabe4573)
+     ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/cfbf092d-9e64-4d04-b891-543c3d7baaa5)
+

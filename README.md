@@ -36,13 +36,16 @@ You can also check detailed EDA on columns, this includes:
   
   2) Histogram for numaric data with custom bin number or using freeman diaconis
 
-    ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/0d6dc9a4-a636-46c9-8a2e-89f5c7bf691e)
+     ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/0d6dc9a4-a636-46c9-8a2e-89f5c7bf691e)
 
-  4) Stacked Bar for boolean data with percentage of each bool from total values
+  3) Stacked Bar for boolean data with percentage of each bool from total values
+     
      ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/239ab2d6-ab9c-4e90-8b24-9415d061812b)
   
-  5) Most Common Values
+  4) Most Common Values
+     
      ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/725871f6-af42-4bb1-8def-32e1822661fc)
 
-  6) Extreme Values (Outliers)
+  5) Extreme Values (Outliers)
+     
      ![image](https://github.com/Gallillio/Tkinter-Data_visualizer/assets/117813417/828f6bfb-7253-44e4-876e-1d23dabe4573)
